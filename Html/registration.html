@@ -1,0 +1,81 @@
+<html>
+<head>
+ <title><legend>THE HUB</legend></title>
+<script language="javascript" type="text/javascript">
+ function checkPass()
+{
+    //Store the password field objects into variables ...
+    var pass1 = document.getElementById('pass1');
+    var pass2 = document.getElementById('pass2');
+    //Store the Confimation Message Object ...
+    var message = document.getElementById('confirmMessage');
+    //Set the colors we will be using ...
+    var goodColor = "#66cc66";
+    var badColor = "#ff6666";
+    //Compare the values in the password field 
+    //and the confirmation field
+    if(pass1.value == pass2.value){
+        //The passwords match. 
+        //Set the color to the good color and inform
+        //the user that they have entered the correct password 
+        pass2.style.backgroundColor = goodColor;
+        message.style.color = goodColor;
+        message.innerHTML = "Passwords Match!"
+    }else{
+        //The passwords do not match.
+        //Set the color to the bad color and
+        //notify the user.
+        pass2.style.backgroundColor = badColor;
+        message.style.color = badColor;
+        message.innerHTML = "Passwords Do Not Match!"
+    }
+
+}
+function validateForm() {
+    var x = document.forms["f1"]["fname"].value;
+    if (x == "")
+        alert("Name must be filled out");
+        return false;
+}
+</script>  
+</head>
+<body>
+<div>
+<h2><img src="1.jpg" align="center" height="100" width="100"></img><br><br>THE HUB</h2>
+<link rel="stylesheet" type="text/css" href="styles.css">
+</div>
+<div align= "center" >
+ <form name="f1" align="center"  onsubmit="returnvalidateForm()" method="post">
+  <B><label>First Name :</B></label></B><input type="text" name="fname" placeholder="enter first name.."><br>
+  <B><label>Last Name :</B></label></B><input type="text"  placeholder="enter last name.." required="required"><br>
+  <B><label>E-mail : </B></label><input type="email"  placeholder="enter a valid email." required="required"><br>
+<!-- 
+    At least 1 Uppercase
+    At least 1 Lowercase
+    At least 1 Number
+    At least 1 Symbol, symbol allowed --> 
+<!--!@#$%^&*_=+-Min 8 chars and Max 12 chars-->
+
+  <B><label>Password :</B></label><input type="password" id="pass1"  pattern="/^[a-zA-Z0-9!@#\$%\^\&*_=+-]{8,12}$/g"  placeholder="min 8 characters..." required="required" "><br>
+  <B><label>re-enter password :</B></label><input type="password" id="pass2"  pattern="/^[a-zA-Z0-9!@#\$%\^\&*_=+-]{8,12}$/g"   placeholder="type the password..." onkeyup="checkPass(); return false;"  required="required"><br>
+<span id="confirmMessage" class="confirmMessage"></span>
+<B><label>Gender :</label></B>
+<B><label>Male:</label></B><input type="radio" name="gender" value="male"><br>
+<B><label>Female:</label><input type="radio" name="gender" value="female"><br>
+<B>date:</B><input type="date" max="31"placeholder="Day">
+<B><label>month<input type="month"max="12"placeholder="Month">
+              <input type="year"max="2017"placeholder="Year">
+  <B>Qualification</B> &nbsp; &nbsp;
+     <select>   
+	<option>B.tech</option> 
+	<option>Degree</option> 
+	<option>Inter</option> 
+      </select><br>
+   <input type="checkbox" required> <B>I accept the terms</B><br>
+   <input type="submit" value="submit" formaction="login.html">&nbsp;&nbsp;
+   <input type="reset" value="reset">
+
+</form>
+ 
+</body>
+</html>
