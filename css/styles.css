@@ -1,0 +1,22 @@
+body {   
+    background-image: url("swecha.png");  
+     background-repeat: no-repeat; 
+    background-image-width:100px;
+    background-size:100% 150%;
+    margin-right:400px;
+}
+h1 {  
+    color: red;  
+    margin-centre: 20px;  
+}
+  
+.form{
+align:center;
+}
+   
+label{
+color: white;
+}
+B{
+color: white;
+}
