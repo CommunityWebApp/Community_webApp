@@ -1,0 +1,54 @@
+body {
+    background-image: url("a2.jpg");
+    background-repeat: no-repeat;
+    background-size: 1500px 1000px;
+}
+input[type="text"] {
+        border:2px solid pink;
+	border-radius:10px;
+	height: 40px;
+	width: 300px;
+}
+input[type="date"] {
+   border:2px solid pink;
+	border-radius:10px;
+	height: 40px;
+	width: 300px;
+}
+input[type="password"] {
+   border:2px solid pink;
+	border-radius:10px;
+	height: 40px;
+	width: 300px;
+}
+input[type="email"] {
+   border:2px solid pink;
+	border-radius:10px;
+	height: 40px;
+	width: 300px;
+}
+input[type="radio"] {
+   border:2px solid pink;
+	border-radius:10px;
+	height: 20px;
+	width: 20px;
+}
+input[type="submit"] {
+  background-color: #ff0033; 
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+}
+
+select {
+border:2px solid pink;
+border-radius:10px;
+height:40px;
+width:300px;
+}
+select:hover {
+color:black;
+}
