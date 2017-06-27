@@ -1,0 +1,3458 @@
+<html>
+<title>JavaScript</title>
+<body>
+<h3>Why JavaScript?</h3>
+<p>JavaScript is an important language because it is the language of the web browser. Its
+association with the browser makes it one of the most popular programming lan-
+guages in the world. At the same time, it is one of the most despised programming
+languages in the world. The API of the browser, the Document Object Model
+(DOM) is quite awful, and JavaScript is unfairly blamed. The DOM would be pain-
+ful to work with in any language. The DOM is poorly specified and inconsistently
+implemented. This book touches only very lightly on the DOM. I think writing a
+<p>Good Parts book about the DOM would be extremely challenging.</p>
+JavaScript is most despised because it isn’t some other language. If you are good in
+some other language and you have to program in an environment that only supports
+JavaScript, then you are forced to use JavaScript, and that is annoying. Most people
+in that situation don’t even bother to learn JavaScript first, and then they are sur-
+prised when JavaScript turns out to have significant differences from the some other
+<p>language they would rather be using, and that those differences matter.</p>
+The amazing thing about JavaScript is that it is possible to get work done with it
+without knowing much about the language, or even knowing much about program-
+ming. It is a language with enormous expressive power. It is even better when you
+know what you’re doing. Programming is difficult business. It should never be
+undertaken in ignorance.</p>
+<h3>Analyzing JavaScript</h3>
+<p>JavaScript is built on some very good ideas and a few very bad ones.
+The very good ideas include functions, loose typing, dynamic objects, and an expres-
+sive object literal notation. The bad ideas include a programming model based on
+global variables.</p>
+<p>JavaScript’s functions are first class objects with (mostly) lexical scoping. JavaScript
+is the first lambda language to go mainstream. Deep down, JavaScript has more in
+common with Lisp and Scheme than with Java. It is Lisp in C’s clothing. This makes
+<p>JavaScript a remarkably powerful language.</p>
+The fashion in most programming languages today demands strong typing. The the-
+ory is that strong typing allows a compiler to detect a large class of errors at compile
+time. The sooner we can detect and repair errors, the less they cost us. JavaScript is a
+loosely typed language, so JavaScript compilers are unable to detect type errors. This
+can be alarming to people who are coming to JavaScript from strongly typed lan-
+guages. But it turns out that strong typing does not eliminate the need for careful
+testing. And I have found in my work that the sorts of errors that strong type check-
+ing finds are not the errors I worry about. On the other hand, I find loose typing to
+be liberating. I don’t need to form complex class hierarchies. And I never have to cast
+or wrestle with the type system to get the behavior that I want.</p>
+<p>JavaScript has a very powerful object literal notation. Objects can be created simply
+by listing their components. This notation was the inspiration for JSON, the popu-
+lar data interchange format. </p>
+<p>A controversial feature in JavaScript is prototypal inheritance. JavaScript has a class-
+free object system in which objects inherit properties directly from other objects. This
+is really powerful, but it is unfamiliar to classically trained programmers. If you attempt
+to apply classical design patterns directly to JavaScript, you will be frustrated. But if
+you learn to work with JavaScript’s prototypal nature, your efforts will be rewarded.
+JavaScript is much maligned for its choice of key ideas. For the most part, though,
+those choices were good, if unusual. But there was one choice that was particularly
+bad: JavaScript depends on global variables for linkage. All of the top-level variables
+of all compilation units are tossed together in a common namespace called the global
+object. This is a bad thing because global variables are evil, and in JavaScript they are
+fundamental. Fortunately, as we will see, JavaScript also gives us the tools to miti-
+gate this problem.</p>
+<p>In a few cases, we can’t ignore the bad parts. There are some unavoidable awful
+parts, which will be called out as they occur. They will also be summarized in
+But we will succeed in avoiding most of the bad parts in this book,
+summarizing much of what was left out in Appendix B. If you want to learn more
+about the bad parts and how to use them badly, consult any other JavaScript book.
+The standard that defines JavaScript (aka JScript) is the third edition of The
+ECMAScript Programming Language The language described in
+this book is a proper subset of ECMAScript. This book does not describe the whole
+language because it leaves out the bad parts. The treatment here is not exhaustive. It
+avoids the edge cases. You should, too. There is danger and misery at the edges.
+Appendix C describes a programming tool called JSLint, a JavaScript parser that can
+analyze a JavaScript program and report on the bad parts that it contains. JSLint pro-
+vides a degree of rigor that is generally lacking in JavaScript development. It can give
+you confidence that your programs contain only the good parts.</p>
+<p>JavaScript is a language of many contrasts. It contains many errors and sharp edges,
+so you might wonder, “Why should I use JavaScript?” There are two answers. The
+first is that you don’t have a choice. The Web has become an  platform for
+application development, and JavaScript is the only language that is found in all
+browsers. It is unfortunate that Java failed in that environment; if it hadn’t, there
+could be a choice for people desiring a strongly typed classical language. But Java did
+fail and JavaScript is flourishing, so there is evidence that JavaScript did something
+right.</p>
+<p>The other answer is that, despite its deficiencies, JavaScript is really good. It is light-
+weight and expressive. And once you get the hang of it, functional programming is a
+lot of fun.</p>
+<p>But in order to use the language well, you must be well informed about its limita-
+tions. I will pound on those with some brutality. Don’t let that discourage you. The
+good parts are good enough to compensate for the bad parts.</p>
+<h3>A Simple Testing Ground</h3>
+<p>If you have a web browser and any text editor, you have everything you need to run
+JavaScript programs. First, make an HTML file with a name like program.html:</p>
+<p>
+<pre>
+&lt;
+html
+body
+pre
+script src="program.js"
+ script
+pre
+body
+html
+pre
+&gt;
+</pre>
+ </p>
+<p>Then, make a file in the same directory with a name like program.js:</p>
+<p>document.writeln('Hello, world!');</p>
+<p>Next, open your HTML file in your browser to see the result. Throughout the book,
+a method method is used to define new methods. This is its definition:</p>
+<pre>
+&lt;
+Function.prototype.method = function (name, func) {
+this.prototype[name] = func;
+return this;
+};
+&gt;
+</pre>
+</p>
+<h3>Whitespace</h3>
+<p>Whitespace can take the form of formatting characters or comments. Whitespace is
+usually insignificant, but it is occasionally necessary to use whitespace to separate
+sequences of characters that would otherwise be combined into a single token. For
+example, in:</p>
+<p>var that = this;</p>
+<p>the space between var and that cannot be removed, but the other spaces can be
+removed.</p>
+<p>JavaScript offers two forms of comments, block comments formed with /* */ and
+line-ending comments starting with // . Comments should be used liberally to
+improve the readability of your programs. Take care that the comments always accu-
+rately describe the code. Obsolete comments are worse than no comments.</p>
+<p>The /* */ form of block comments came from a language called PL/I. PL/I chose
+those strange pairs as the symbols for comments because they were unlikely to occur
+in that language’s programs, except perhaps in string literals. In JavaScript, those
+pairs can also occur in regular expression literals, so block comments are not safe for
+commenting out blocks of code. For example:</p>
+<p>/*</p>
+<p>var rm_a = /a*/.match(s);</p>
+<p>*/</p>
+<P>causes a syntax error. So, it is recommended that /* */ comments be avoided and //
+comments be used instead. In this book, // will be used exclusively.</p>
+<h3>Names</h3>
+<p>A name is a letter optionally followed by one or more letters, digits, or underbars. A
+name cannot be one of these reserved words:</p>
+<p>
+<pre>
+&lt;
+abstract
+boolean break byte
+case catch char class const continue
+debugger default delete do double
+else enum export extends
+false final finally float for function
+goto
+if implements import in instanceof int interface
+long
+native new null
+package private protected public
+return
+short static super switch synchronized
+this throw throws transient true try typeof
+var volatile void
+while with
+&gt;
+</pre>
+<p>
+Most of the reserved words in this list are not used in the language. The list does not
+include some words that should have been reserved but were not, such as undefined ,
+NaN , and Infinity . It is not permitted to name a variable or parameter with a reserved
+word. Worse, it is not permitted to use a reserved word as the name of an object
+property in an object literal or following a dot in a refinement.
+Names are used for statements, variables, parameters, property names, operators,
+and labels.</p>
+<h3>Numbers</h3>
+<p>JavaScript has a single number type. Internally, it is represented as 64-bit floating
+point, the same as Java’s double . Unlike most other programming languages, there is
+no separate integer type, so 1 and 1.0 are the same value. This is a significant conve-
+nience because problems of overflow in short integers are completely avoided, and
+all you need to know about a number is that it is a number. A large class of numeric
+type errors is avoided.</p>
+<p>If a number literal has an exponent part, then the value of the literal is computed by
+multiplying the part before the e by 10 raised to the power of the part after the e . So
+100 and 1e2 are the same number.</p>
+<p>Negative numbers can be formed by using the – prefix operator.</p>
+<p>The value NaN is a number value that is the result of an operation that cannot pro-
+duce a normal result. NaN is not equal to any value, including itself. You can detect
+NaN with the isNaN(number) function.</p>
+<p>The value Infinity represents all values greater than 1.79769313486231570e+308 .
+Numbers have methods (see Chapter 8). JavaScript has a Math object that contains a
+set of methods that act on numbers. For example, the Math.floor(number) method
+can be used to convert a number into an integer.</p>
+<h3>Strings</h3>
+<p>A string literal can be wrapped in single quotes or double quotes. It can contain zero
+or more characters. The \ (backslash) is the escape character. JavaScript was built at
+a time when Unicode was a 16-bit character set, so all characters in JavaScript are 16
+bits wide.</p>
+<p>JavaScript does not have a character type. To represent a character, make a string
+with just one character in it.</p>
+<p>The escape sequences allow for inserting characters into strings that are not nor-
+mally permitted, such as backslashes, quotes, and control characters. The \u conven-
+tion allows for specifying character code points numerically.</p>
+<p>"A" === "\u0041"</p>
+<p>Strings have a length property. For example, "seven".length is 5.</p>
+<p>strings are immutable. Once it is made, a string can never be changed. But it is easy
+to make a new string by concatenating other strings together with the + operator.
+Two strings containing exactly the same characters in the same order are considered
+to be the same string. So:</p>
+<p>'c' + 'a' + 't' === 'cat'</p>
+<p>is true.</p>
+<p>Strings have methods (see Chapter 8):</p>
+<p>'cat'.toUpperCase( ) === 'CAT'</p>
+<h3>Statements</h3>
+<p>A compilation unit contains a set of executable statements. In web browsers, each
+script tag delivers a compilation unit that is compiled and immediately executed.
+Lacking a linker, JavaScript throws them all together in a common global
+namespace. There is more on global variables .</p>
+<p>When used inside of a function, the var statement defines the function’s private
+variables.</p>
+<p>The switch , while , for , and do statements are allowed to have an optional label pre-
+fix that interacts with the break statement.</p>
+<p>Statements tend to be executed in order from top to bottom. The sequence of execu-
+tion can be altered by the conditional statements ( if and switch ), by the looping
+statements ( while , for , and do ), by the disruptive statements ( break , return , and
+throw ), and by function invocation.</p>
+<p>A block is a set of statements wrapped in curly braces. Unlike many other languages,
+blocks in JavaScript do not create a new scope, so variables should be defined at the
+top of the function, not in blocks.</p>
+<p>The if statement changes the flow of the program based on the value of the expres-
+sion. The then block is executed if the expression is truthy; otherwise, the optional
+else branch is taken.</p>
+<p>Here are the falsy values:</p>
+<pre>
+&lt;
+ false
+ null
+ undefined
+ The empty string ''
+ The number 0
+ The number NaN
+&gt;
+</pre>
+<p>All other values are truthy, including true , the string 'false' , and all objects.
+The switch statement performs a multiway branch. It compares the expression for
+equality with all of the specified cases. The expression can produce a number or a
+string. When an exact match is found, the statements of the matching case clause are
+executed. If there is no match, the optional default statements are executed.</p>
+<p>A case clause contains one or more case expressions. The case expressions need not be
+constants. The statement following a clause should be a disruptive statement to prevent
+fall through into the next case . The break statement can be used to exit from a switch.
+The while statement performs a simple loop. If the expression is falsy, then the loop
+<p>will break. While the expression is truthy, the block will be executed.</p>
+The for statement is a more complicated looping statement. It comes in two forms.
+The conventional form is controlled by three optional clauses: the initialization, the
+condition, and the increment. First, the initialization is done, which typically initial-
+izes the loop variable. Then, the condition is evaluated. Typically, this tests the loop
+variable against a completion criterion. If the condition is omitted, then a condition of
+true is assumed. If the condition is falsy, the loop breaks. Otherwise, the block is exe-
+cuted, then the increment executes, and then the loop repeats with the condition.</p>
+<p>The other form (called for in ) enumerates the property names (or keys) of an object.
+On each iteration, another property name string from the object is assigned to the
+variable.</p>
+<p>It is usually necessary to test object.hasOwnProperty(variable) to determine whether
+the property name is truly a member of the object or was found instead on the proto-
+type chain.</p>
+<p>
+<pre>
+&lt;
+for (myvar in obj) {
+if (obj.hasOwnProperty(myvar)) {
+...
+}
+}
+&gt;
+</pre>
+</p>
+<p>The do statement is like the while statement except that the expression is tested after
+the block is executed instead of before. That means that the block will always be exe-
+cuted at least once.</p>
+<p>The try statement executes a block and catches any exceptions that were thrown by
+the block. The catch clause defines a new variable that will receive the exception
+object.</p>
+<p>The throw statement raises an exception. If the throw statement is in a try block, then
+control goes to the catch clause. Otherwise, the function invocation is abandoned,
+and control goes to the catch clause of the try in the calling function.
+The expression is usually an object literal containing a name property and a message
+property. The catcher of the exception can use that information to determine what to
+do.</p>
+<p>The return statement causes the early return from a function. It can also specify the
+value to be returned. If a return expression is not specified, then the return value will
+be undefined .</p>
+<p>JavaScript does not allow a line end between the return and the expression.
+An expression statement can either assign values to one or more variables or mem-
+bers, invoke a method, delete a property from an object. The = operator is used for
+assignment. Do not confuse it with the === equality operator. The += operator can
+add or concatenate.</p>
+<h3>Expressions</h3>
+<p>The simplest expressions are a literal value (such as a string or number), a variable, a
+built-in value ( true , false , null , undefined , NaN , or Infinity ), an invocation expres-
+sion preceded by new , a refinement expression preceded by delete , an expression
+wrapped in parentheses, an expression preceded by a prefix operator, or an expres-
+sion followed by:</p>
+<p> An infix operator and another</p>
+ <p> The ? ternary operator followed by another expression, then by : , and then by
+yet another expression</p>
+<p> An invocation</p>
+<p> A refinement</p>
+<p>The ? ternary operator takes three operands. If the first operand is truthy, it pro-
+duces the value of the second operand. But if the first operand is falsy, it produces
+the value of the third operand.</p>
+<p>The operators at the top of the operator precedence list in Table 2-1 have higher pre-
+cedence. They bind the tightest. The operators at the bottom have the lowest prece-
+dence. Parentheses can be used to alter the normal precedence, so:</p>
+<p>2 + 3 * 5 === 17</p>
+<p>(2 + 3) * 5 === 25</p>
+<P>Operator precedence:-</p>
+<table border="1px"
+<tr><td> [] ( )</td><td> Refinement and invocation</td></tr>
+<tr><td> delete new typeof + - ! </td><td>Unary operators</td></tr>
+<tr><td> * / % </td><td>Multiplication, division, modulo</td></tr>
+<tr><td> + -</td><td> Addition/concatenation, subtraction</td></tr>
+<tr><td> >= <= > </td><td>Inequality</td></tr>
+<tr><td> === !== </td><td>Equality</td></tr>
+<tr><td> &&</td><td> Logical and</td></tr>
+<tr><td> ||</td><td> Logical or</td></tr>
+<tr><td> ?:</td><td> Ternary</td></tr>
+</table>
+<p>The values produced by typeof are 'number' , 'string' , 'boolean' , 'undefined' ,
+'function' , and 'object' . If the operand is an array or null , then the result is
+'object' , which is wrong. There will be more about typeof and
+<p>If the operand of ! is truthy, it produces false . Otherwise, it produces true .
+The + operator adds or concatenates. If you want it to add, make sure both operands
+are numbers.</p>
+<p>The / operator can produce a noninteger result even if both operands are integers.
+The && operator produces the value of its first operand if the first operand is falsy.
+Otherwise, it produces the value of the second operand.</p>
+<p>The || operator produces the value of its first operand if the first operand is truthy.
+<p>Otherwise, it produces the value of the second operand.</p>
+Invocation causes the execution of a function value. The invocation operator is a pair
+of parentheses that follow the function value. The parentheses can contain argu-
+ments that will be delivered to the function. There will be much more about func-
+tions.</p>
+<h3>Literals</h3>
+<p>Object literals are a convenient notation for specifying new objects. The names of the
+properties can be specified as names or as strings. The names are treated as literal
+names, not as variable names, so the names of the properties of the object must be
+known at compile time. The values of the properties are expressions. There will be
+more about object literals.</p>
+<p>Array literals are a convenient notation for specifying new arrays. There will be more
+about array literals.</p>
+<h3>Functions</h3>
+<p>A function literal defines a function value. It can have an optional name that it can
+use to call itself recursively. It can specify a list of parameters that will act as vari-
+ables initialized by the invocation arguments. The body of the function includes vari-
+able definitions and statements. There will be more about functions</p>
+<h3>Objects</h3>
+<p>The simple types of JavaScript are numbers, strings, booleans ( true and false ), null ,
+and undefined . All other values are objects. Numbers, strings, and booleans are
+object-like in that they have methods, but they are immutable. Objects in JavaScript
+are mutable keyed collections. In JavaScript, arrays are objects, functions are objects,
+regular expressions are objects, and, of course, objects are objects.</p>
+<p>An object is a container of properties, where a property has a name and a value. A
+property name can be any string, including the empty string. A property value can be
+any JavaScript value except for undefined .</p>
+<p>Objects in JavaScript are class-free. There is no constraint on the names of new prop-
+erties or on the values of properties. Objects are useful for collecting and organizing
+data. Objects can contain other objects, so they can easily represent tree or graph
+structures.</p>
+<p>JavaScript includes a prototype linkage feature that allows one object to inherit the
+properties of another. When used well, this can reduce object initialization time and
+memory consumption.</p>
+<h3>Object Literals</h3>
+<p>Object literals provide a very convenient notation for creating new object values.
+An object literal is a pair of curly braces surrounding zero or more name/value
+pairs. An object literal can appear anywhere an expression can appear:
+</p>
+<pre>
+&lt;
+var empty_object = {};
+var stooge = {
+"first-name": "Jerome",
+"last-name": "Howard"
+};
+&gt;
+</pre>
+<p>
+A property’s name can be any string, including the empty string. The quotes around
+a property’s name in an object literal are optional if the name would be a legal
+JavaScript name and not a reserved word. So quotes are required around "first-
+name" , but are optional around first_name . Commas are used to separate the pairs.
+A property’s value can be obtained from any expression, including another object lit-
+eral. Objects can nest:</p>
+<pre>
+&lt;var flight = {
+airline: "Oceanic",
+number: 815,
+departure: {
+IATA: "SYD",
+time: "2004-09-22 14:55",
+city: "Sydney"
+},
+arrival: {
+IATA: "LAX",
+time: "2004-09-23 10:42",
+city: "Los Angeles"
+}
+};&gt;
+</pre>
+<h3>Retrieval</h3>
+<p>Values can be retrieved from an object by wrapping a string expression in a [ ] suf-
+fix. If the string expression is a constant, and if it is a legal JavaScript name and not a
+reserved word, then the . notation can be used instead. The . notation is preferred
+because it is more compact and it reads better:</p>
+<pre>
+&lt;
+stooge["first-name"] // "Joe"
+flight.departure.IATA  // "SYD"
+&gt;
+</pre>
+<p>The undefined value is produced if an attempt is made to retrieve a nonexistent
+member:</p>
+<pre>
+&lt;
+stooge["middle-name"]  // undefined
+flight.status  // undefined
+stooge["FIRST-NAME"]  // undefined
+&gt;
+</pre>
+<p>The || operator can be used to fill in default values:</p>
+<pre>
+&lt;
+var middle = stooge["middle-name"] || "(none)";
+var status = flight.status || "unknown";
+&gt;
+</pre>
+<p>Attempting to retrieve values from undefined will throw a TypeError exception. This
+can be guarded against with the && operator:</p>
+<pre>
+&lt;
+flight.equipment   // undefined
+flight.equipment.model  // throw "TypeError"
+flight.equipment && flight.equipment.model  // undefined
+&gt;
+</pre>
+<h3>Update</h3>
+<p>A value in an object can be updated by assignment. If the property name already
+exists in the object, the property value is replaced:</p>
+<pre>
+&lt;
+stooge['first-name'] = 'Jerome';
+&gt;
+</pre>
+If the object does not already have that property name, the object is augmented:
+<pre>
+&lt;
+stooge['middle-name'] = 'Lester';
+stooge.nickname = 'Curly';
+flight.equipment = {
+model: 'Boeing 777'
+};
+flight.status = 'overdue';
+&gt;
+</pre>
+<h3>Reference</h3>
+<p>Objects are passed around by reference. They are never copied:</p>
+<pre>
+&lt;
+var x = stooge;
+x.nickname = 'Curly';
+var nick = stooge.nickname;
+// nick is 'Curly' because x and stooge
+// are references to the same object
+var a = {}, b = {}, c = {};
+// a, b, and c each refer to a
+// different empty object
+a = b = c = {};
+// a, b, and c all refer to
+// the same empty object
+&gt;
+</pre>
+<h3>Prototype</h3>
+<p>Every object is linked to a prototype object from which it can inherit properties. All
+objects created from object literals are linked to Object.prototype , an object that
+comes standard with JavaScript.
+<p>When you make a new object, you can select the object that should be its prototype.
+The mechanism that JavaScript provides to do this is messy and complex, but it can
+be significantly simplified. We will add a create method to the Object function. The
+create method creates a new object that uses an old object as its prototype. There
+will be much more about functions.</p>
+<pre>
+&lt;
+if (typeof Object.create !== 'function') {
+Object.create = function (o) {
+var F = function () {};
+F.prototype = o;
+return new F();
+};
+}
+var another_stooge = Object.create(stooge);
+&gt;
+</pre>
+<p>The prototype link has no effect on updating. When we make changes to an object,
+the object’s prototype is not touched:</p>
+<pre>
+&lt;
+another_stooge['first-name'] = 'Harry';
+another_stooge['middle-name'] = 'Moses';
+another_stooge.nickname = 'Moe';
+&gt;
+</pre>
+<p>The prototype link is used only in retrieval. If we try to retrieve a property value from
+an object, and if the object lacks the property name, then JavaScript attempts to
+retrieve the property value from the prototype object. And if that object is lacking the
+property, then it goes to its prototype, and so on until the process finally bottoms out
+with Object.prototype . If the desired property exists nowhere in the prototype chain,
+then the result is the undefined value. This is called delegation.</p>
+<p>The prototype relationship is a dynamic relationship. If we add a new property to a
+prototype, that property will immediately be visible in all of the objects that are
+based on that prototype:</p>
+<pre>
+&lt;
+stooge.profession = 'actor';
+another_stooge.profession  // 'actor'
+&gt;
+</pre>
+<p>We will see more about the prototype chain</p>
+<h3>Reflection</h3>
+<p>It is easy to inspect an object to determine what properties it has by attempting to
+retrieve the properties and examining the values obtained. The typeof operator can
+be very helpful in determining the type of a property:</p>
+<pre>
+&lt;
+typeof flight.number         // 'number'
+typeof flight.status        //'string'
+typeof flight.arrival       //'object'
+typeof flight.manifest'     //undefined
+&gt;
+</pre>'
+<p>Some care must be taken because any property on the prototype chain can produce a
+value:</p>
+<pre>
+&lt;
+typeof flight.toString    // 'function'
+typeof flight.constructor // 'function'
+&gt;
+</pre>
+<P>There are two approaches to dealing with these undesired properties. The first is to
+have your program look for and reject function values. Generally, when you are
+reflecting, you are interested in data, and so you should be aware that some values
+could be functions.</p>
+<p>The other approach is to use the hasOwnProperty method, which returns true if the
+object has a particular property. The hasOwnProperty method does not look at the
+prototype chain:</p>
+<pre>
+&lt;
+flight.hasOwnProperty('number')  // true
+flight.hasOwnProperty('constructor')  // false
+&gt;
+</pre>
+<h3>Enumeration</h3>
+<p>The for in statement can loop over all of the property names in an object. The enu-
+meration will include all of the properties—including functions and prototype prop-
+erties that you might not be interested in—so it is necessary to filter out the values
+you don’t want. The most common filters are the hasOwnProperty method and using
+typeof to exclude functions:</p>
+<pre>
+&lt;
+var name;
+for (name in another_stooge) {
+if (typeof another_stooge[name] !== 'function') {
+document.writeln(name + ': ' + another_stooge[name]);
+}
+}
+&gt;
+</pre>
+<P>There is no guarantee on the order of the names, so be prepared for the names to
+appear in any order. If you want to assure that the properties appear in a particular
+order, it is best to avoid the for in statement entirely and instead make an array con-
+taining the names of the properties in the correct order:</P>
+<pre>
+&lt;
+var i;
+var properties = [
+'first-name',
+'middle-name',
+'last-name',
+'profession'
+];
+for (i = 0; i  properties.length; i += 1) {
+document.writeln(properties[i] + ': ' +
+another_stooge[properties[i]]);
+}
+&gt;
+</pre>
+<P>By using for instead of for in , we were able to get the properties we wanted without
+worrying about what might be dredged up from the prototype chain, and we got
+them in the correct order.</p>
+<h3>Delete</h3>
+<p>The delete operator can be used to remove a property from an object. It will remove
+a property from the object if it has one. It will not touch any of the objects in the proto-
+type linkage.</P>
+<p>Removing a property from an object may allow a property from the prototype link-
+age to shine through:</P>
+<P>another_stooge.nickname // 'Moe'</P>
+<pre>
+&lt;
+// Remove nickname from another_stooge, revealing
+// the nickname of the prototype.
+Objectsdelete another_stooge.nickname;
+another_stooge.nickname // 'Curly'
+&gt;
+</pre>
+<h3>Global Abatement</h3>
+<p>JavaScript makes it easy to define global variables that can hold all of the assets of
+your application. Unfortunately, global variables weaken the resiliency of programs
+and should be avoided.</P>
+<P>One way to minimize the use of global variables is to create a single global variable
+for your application:</P>
+<pre>
+&lt;
+var MYAPP = {};
+&gt;
+</pre>
+That variable then becomes the container for your application:
+<pre>
+&lt;
+MYAPP.stooge = {
+"first-name": "Joe",
+"last-name": "Howard"
+};
+MYAPP.flight = {
+airline: "Oceanic",
+number: 815,
+departure: {
+IATA: "SYD",
+time: "2004-09-22 14:55",
+city: "Sydney"
+},
+arrival: {
+IATA: "LAX",
+time: "2004-09-23 10:42",
+city: "Los Angeles"
+}
+};
+&gt;
+</pre>
+<P>By reducing your global footprint to a single name, you significantly reduce the
+chance of bad interactions with other applications, widgets, or libraries. Your pro-
+gram also becomes easier to read because it is obvious that MYAPP.stooge refers to a
+top-level structure. In the next chapter, we will see ways to use closure for informa-
+tion hiding, which is another effective global abatement technique.</p>
+<h3>Functions</h3>
+<p>The best thing about JavaScript is its implementation of functions. It got almost every-
+thing right. But, as you should expect with JavaScript, it didn’t get everything right.
+A function encloses a set of statements. Functions are the fundamental modular unit
+of JavaScript. They are used for code reuse, information hiding, and composition.
+Functions are used to specify the behavior of objects. Generally, the craft of pro-
+gramming is the factoring of a set of requirements into a set of functions and data
+structures.</P>
+<h3>Function Objects</h3>
+<p>Functions in JavaScript are objects. Objects are collections of name/value pairs hav-
+ing a hidden link to a prototype object. Objects produced from object literals are
+linked to Object.prototype . Function objects are linked to Function.prototype
+(which is itself linked to Object.prototype ). Every function is also created with two
+additional hidden properties: the function’s context and the code that implements
+the function’s behavior.</P>
+<P>Every function object is also created with a prototype property. Its value is an object
+with a constructor property whose value is the function. This is distinct from the
+hidden link to Function.prototype . The meaning of this convoluted construction will
+be revealed.</P>
+<P>Since functions are objects, they can be used like any other value. Functions can be
+stored in variables, objects, and arrays. Functions can be passed as arguments to
+functions, and functions can be returned from functions. Also, since functions are
+objects, functions can have methods.</P>
+<P>The thing that is special about functions is that they can be invoked.</p>
+<h3>Function Literal</h3>
+<p>Function objects are created with function literals:</P>
+<pre>
+&lt;
+// Create a variable called add and store a function
+// in it that adds two numbers.
+var add = function (a, b) {
+return a + b;
+};
+&gt;
+</pre>
+<P>A function literal has four parts. The first part is the reserved word function .
+The optional second part is the function’s name. The function can use its name to
+call itself recursively. The name can also be used by debuggers and development
+tools to identify the function. If a function is not given a name, as shown in the previ-
+ous example, it is said to be anonymous.</P>
+<P>The third part is the set of parameters of the function, wrapped in parentheses.
+Within the parentheses is a set of zero or more parameter names, separated by com-
+mas. These names will be defined as variables in the function. Unlike ordinary vari-
+ables, instead of being initialized to undefined , they will be initialized to the
+arguments supplied when the function is invoked.</P>
+<P>The fourth part is a set of statements wrapped in curly braces. These statements are
+the body of the function. They are executed when the function is invoked.</P>
+<P>A function literal can appear anywhere that an expression can appear. Functions can
+be defined inside of other functions. An inner function of course has access to its
+parameters and variables. An inner function also enjoys access to the parameters and
+variables of the functions it is nested within. The function object created by a func-
+tion literal contains a link to that outer context. This is called closure. This is the
+source of enormous expressive power.</p>
+<h3>Invocation</h3>
+<p>Invoking a function suspends the execution of the current function, passing control
+and parameters to the new function. In addition to the declared parameters, every
+function receives two additional parameters: this and arguments . The this parame-
+ter is very important in object oriented programming, and its value is determined by
+the invocation pattern. There are four patterns of invocation in JavaScript: the
+method invocation pattern, the function invocation pattern, the constructor invoca-
+tion pattern, and the apply invocation pattern. The patterns differ in how the bonus
+parameter this is initialized.</P>
+<P>The invocation operator is a pair of parentheses that follow any expression that pro-
+duces a function value. The parentheses can contain zero or more expressions, sepa-
+rated by commas. Each expression produces one argument value. Each of the
+argument values will be assigned to the function’s parameter names. There is no run-
+time error when the number of arguments and the number of parameters do not
+match. If there are too many argument values, the extra argument values will be
+ignored. If there are too few argument values, the undefined value will be substituted
+for the missing values. There is no type checking on the argument values: any type of
+value can be passed to any parameter.</p>
+<h3>The Method Invocation Pattern</h3>
+<p>When a function is stored as a property of an object, we call it a method. When a
+method is invoked, this is bound to that object. If an invocation expression con-
+tains a refinement (that is, a . dot expression or [subscript] expression), it is
+invoked as a method:</P>
+<pre>
+&lt;
+// Create myObject. It has a value and an increment
+// method. The increment method takes an optional
+// parameter. If the argument is not a number, then 1
+// is used as the default.
+var myObject = {
+value: 0,
+increment: function (inc) {
+this.value += typeof inc === 'number' ? inc : 1;
+}
+};
+myObject.increment( );
+document.writeln(myObject.value); // 1
+myObject.increment(2);
+document.writeln(myObject.value); // 3
+&gt;
+</pre>
+A method can use this to access the object so that it can retrieve values from the
+object or modify the object. The binding of this to the object happens at invocation
+time. This very late binding makes functions that use this highly reusable. Methods
+that get their object context from this are called public methods.</p>
+<h3>The Function Invocation Pattern</h3>
+<p>When a function is not the property of an object, then it is invoked as a function:</P>
+<pre>
+&lt;
+var sum = add(3, 4);  // sum is 7
+&gt;
+</pre>
+<P>When a function is invoked with this pattern, this is bound to the global object.
+This was a mistake in the design of the language. Had the language been designed
+correctly, when the inner function is invoked, this would still be bound to the this
+variable of the outer function. A consequence of this error is that a method cannot
+employ an inner function to help it do its work because the inner function does not
+share the method’s access to the object as its this is bound to the wrong value. For-
+tunately, there is an easy workaround. If the method defines a variable and assigns it
+the value of this , the inner function will have access to this through that variable. By
+convention, the name of that variable is that :</p>
+<pre>
+&lt;
+// Augment myObject with a double method.
+myObject.double = function ( ) {
+var that = this;   // Workaround.
+var helper = function ( ) {
+that.value = add(that.value, that.value);
+};
+helper( );  // Invoke helper as a function.
+};   // Invoke double as a method.
+myObject.double( );
+&gt;
+</pre>
+<P>document.writeln(myObject.getValue( ));</p>
+<h3>The Constructor Invocation Pattern</h3>
+<p>JavaScript is a prototypal inheritance language. That means that objects can inherit
+properties directly from other objects. The language is class-free.</P>
+<P>This is a radical departure from the current fashion. Most languages today are classi-
+cal. Prototypal inheritance is powerfully expressive, but is not widely understood.<P>
+<P>JavaScript itself is not confident in its prototypal nature, so it offers an object-making
+syntax that is reminiscent of the classical languages. Few classical programmers
+found prototypal inheritance to be acceptable, and classically inspired syntax
+obscures the language’s true prototypal nature. It is the worst of both worlds.</P>
+<P>If a function is invoked with the new prefix, then a new object will be created with a
+hidden link to the value of the function’s prototype member, and this will be bound
+to that new object.</P>
+<P>The new prefix also changes the behavior of the return statement. We will see more
+about that next.</P>
+<Pre>
+&lt;
+// Create a constructor function called Quo.
+// It makes an object with a status property.
+var Quo = function (string) {
+this.status = string;
+};
+// Give all instances of Quo a public method
+// called get_status.
+Quo.prototype.get_status = function ( ) {
+return this.status;
+};    // Make an instance of Quo.
+var myQuo = new Quo("confused");
+document.writeln(myQuo.get_status( ));  // confused
+&gt;
+</pre>
+<p>functions that are intended to be used with the new prefix are called constructors. By
+convention, they are kept in variables with a capitalized name. If a constructor is
+called without the new prefix, very bad things can happen without a compile-time or
+runtime warning, so the capitalization convention is really important.
+Use of this style of constructor functions is not recommended. We will see better
+alternatives.</p>
+<h3>The Apply Invocation Pattern</h3>
+<p>Because JavaScript is a functional object-oriented language, functions can have
+methods.</p>
+<p>The apply method lets us construct an array of arguments to use to invoke a func-
+tion. It also lets us choose the value of this . The apply method takes two parame-
+ters. The first is the value that should be bound to this . The second is an array of
+parameters.</p>
+<pre>
+&lt;
+// Make an array of 2 numbers and add them.
+var array = [3, 4];
+var sum = add.apply(null, array);
+// sum is 7
+// Make an object with a status member.
+var statusObject = {
+status: 'A-OK'
+};
+// statusObject does not inherit from Quo.prototype,
+// but we can invoke the get_status method on
+// statusObject even though statusObject does not have
+// a get_status method.
+var status = Quo.prototype.get_status.apply(statusObject);
+
+// status is 'A-OK'
+&gt;
+</pre>
+</p>
+<h3>Arguments</h3>
+<p>A bonus parameter that is available to functions when they are invoked is the
+arguments array. It gives the function access to all of the arguments that were sup-
+plied with the invocation, including excess arguments that were not assigned to
+parameters. This makes it possible to write functions that take an unspecified num-
+ber of parameters:</p>
+<p>// Make a function that adds a lot of stuff.</p>
+// Note that defining the variable sum inside of
+// the function does not interfere with the sum
+// defined outside of the function. The function
+// only sees the inner one.
+<pre>
+&lt;
+var sum = function ( ) {
+var i, sum = 0;
+for (i = 0; i  arguments.length; i += 1) {
+sum += arguments[i];
+}
+return sum;
+};
+<p>
+document.writeln(sum(4, 8, 15, 16, 23, 42)); // 108</p>
+&gt;
+</pre>
+<p>This is not a particularly useful pattern. we will see how we can add a
+similar method to an array.</p>
+<p>Because of a design error, arguments is not really an array. It is an array-like object.
+arguments has a length property, but it lacks all of the array methods. We will see a
+consequence of that design error at the end.</p>
+<h3>Return</h3>
+<p>When a function is invoked, it begins execution with the first statement, and ends
+when it hits the } that closes the function body. That causes the function to return
+control to the part of the program that invoked the function.</p>
+<p>The return statement can be used to cause the function to return early. When return is
+executed, the function returns immediately without executing the remaining statements.
+A function always returns a value. If the return value is not specified, then undefined
+is returned.</p>
+If the function was invoked with the new prefix and the return value is not an object,
+then this (the new object) is returned instead.</p>
+<h3>Exceptions</h3>
+<p>JavaScript provides an exception handling mechanism. Exceptions are unusual (but
+not completely unexpected) mishaps that interfere with the normal flow of a pro-
+gram. When such a mishap is detected, your program should throw an exception:</p>
+<pre>
+&lt;
+var add = function (a, b) {
+if (typeof a !== 'number' || typeof b !== 'number') {
+throw {
+name: 'TypeError',
+message: 'add needs numbers'
+};
+}
+return a + b;
+}
+&gt;
+</pre>
+<p>
+The throw statement interrupts execution of the function. It should be given an
+exception object containing a name property that identifies the type of the exception,
+and a descriptive message property. You can also add other properties.</p>
+<p>The exception object will be delivered to the catch clause of a try statement:</p>
+<pre>
+&lt;
+// Make a try_it function that calls the new add
+// function incorrectly.
+var try_it = function ( ) {
+try {
+add("seven");
+} catch (e) {
+document.writeln(e.name + ': ' + e.message);
+}
+}
+try_it( );
+&gt;	
+</pre>
+<p>If an exception is thrown within a try block, control will go to its catch clause.
+A try statement has a single catch block that will catch all exceptions. If your han-
+dling depends on the type of the exception, then the exception handler will have to
+inspect the name to determine the type of the exception.</p>
+<h3>Augmenting Types</h3>
+<p>JavaScript allows the basic types of the language to be augmented.we
+saw that adding a method to Object.prototype makes that method available to all
+objects. This also works for functions, arrays, strings, numbers, regular expressions,
+and booleans.</P>
+<P>For example, by augmenting Function.prototype , we can make a method available to
+all functions:</P>
+<pre>
+&lt;
+Function.prototype.method = function (name, func) {
+this.prototype[name] = func;
+return this;
+};
+&gt;	
+</pre>
+<P>By augmenting Function.prototype with a method method, we no longer have to type
+the name of the prototype property. That bit of ugliness can now be hidden.
+JavaScript does not have a separate integer type, so it is sometimes necessary to
+extract just the integer part of a number. The method JavaScript provides to do that
+is ugly. We can fix it by adding an integer method to Number.prototype . It uses either
+Math.ceiling or Math.floor , depending on the sign of the number:</P>
+<pre>
+&lt;
+Number.method('integer', function ( ) {
+return Math[this  0 ? 'ceiling' : 'floor'](this);
+});
+document.writeln((-10 / 3).integer( ));  // -3
+&gt;	
+</pre>
+JavaScript lacks a method that removes spaces from the ends of a string. That is an
+easy oversight to fix:
+<pre>
+&lt;
+String.method('trim', function ( ) {
+return this.replace(/^\s+|\s+$/g, '');
+});
+document.writeln('"' + "
+neat
+".trim( ) + '"');
+&gt;	
+</pre>
+<P>Our trim method uses a regular expression. We will see much more about regular
+expressions.</P>
+<P>By augmenting the basic types, we can make significant improvements to the expres-
+siveness of the language. Because of the dynamic nature of JavaScript’s prototypal
+inheritance, all values are immediately endowed with the new methods, even values
+that were created before the methods were created.</P>
+<P>The prototypes of the basic types are public structures, so care must be taken when
+mixing libraries. One defensive technique is to add a method only if the method is
+known to be missing:</P>
+<pre>
+&lt;
+// Add a method conditionally.
+Function.prototype.method = function (name, func) {
+if (!this.prototype[name]) {
+this.prototype[name] = func;
+}
+};
+&gt;	
+</pre>
+<P>Another concern is that the for in statement interacts badly with prototypes. We
+saw a couple of ways to mitigate that in Chapter 3: we can use the hasOwnProperty
+method to screen out inherited properties, and we can look for specific types.</p>
+<h3>Recursion</h3>
+<P>A recursive function is a function that calls itself, either directly or indirectly. Recur-
+sion is a powerful programming technique in which a problem is divided into a set of
+similar subproblems, each solved with a trivial solution. Generally, a recursive func-
+tion calls itself to solve its subproblems.</P>
+<P>The Towers of Hanoi is a famous puzzle. The equipment includes three posts and a
+set of discs of various diameters with holes in their centers. The setup stacks all of
+the discs on the source post with smaller discs on top of larger discs. The goal is to
+move the stack to the destination post by moving one disc at a time to another post,
+never placing a larger disc on a smaller disc. This puzzle has a trivial recursive solution:</P>
+<pre>
+&lt;
+var hanoi = function (disc, src, aux, dst) {
+if (disc > 0) {
+hanoi(disc - 1, src, dst, aux);
+document.writeln('Move disc ' + disc +
+' from ' + src + ' to ' + dst);
+hanoi(disc - 1, aux, src, dst);
+}
+};
+hanoi(3, 'Src', 'Aux', 'Dst');
+&gt;
+</pre>
+It produces this solution for three discs:
+<p>Move disc 1 from Src to Dst</p>
+<p>Move disc 2 from Src to Aux</p>
+<p>Move disc 1 from Dst to Aux</p>
+<p>Move disc 3 from Dst to Dst</p>
+<p>Move disc 1 from Aux to Src</p>
+<p>Move disc 2 from Aux to Dst</p>
+<p>Move disc 1 from Src to Dst</p>
+<p>
+The hanoi function moves a stack of discs from one post to another, using the auxil-
+iary post if necessary. It breaks the problem into three subproblems. First, it uncov-
+ers the bottom disc by moving the substack above it to the auxiliary post. It can then
+move the bottom disc to the destination post. Finally, it can move the substack from
+the auxiliary post to the destination post. The movement of the substack is handled
+by calling itself recursively to work out those subproblems.</p>
+<p>The hanoi function is passed the number of the disc it is to move and the three posts
+it is to use. When it calls itself, it is to deal with the disc that is above the disc it is
+currently working on. Eventually, it will be called with a nonexistent disc number. In
+that case, it does nothing. That act of nothingness gives us confidence that the func-
+tion does not recurse forever.</p>
+<p>Recursive functions can be very effective in manipulating tree structures such as the
+browser’s Document Object Model (DOM). Each recursive call is given a smaller
+piece of the tree to work on:</p>
+<pre>
+&lt;
+// Define a walk_the_DOM function that visits every
+ // node of the tree in HTML source order, starting
+ // from some given node. It invokes a function,
+// passing it each node in turn. walk_the_DOM calls
+// itself to process each of the child nodes.
+var walk_the_DOM = function walk(node, func) {
+func(node);
+node = node.firstChild;
+while (node) {
+walk(node, func);
+node = node.nextSibling;
+}
+};
+
+// Define a getElementsByAttribute function. It
+// takes an attribute name string and an optional
+// matching value. It calls walk_the_DOM, passing it a
+// function that looks for an attribute name in the
+// node. The matching nodes are accumulated in a results array.
+
+var getElementsByAttribute = function (att, value) {
+var results = [];
+walk_the_DOM(document.body, function (node) {
+var actual = node.nodeType === 1 && node.getAttribute(att);
+if (typeof actual === 'string' &&
+(actual === value || typeof value !== 'string')) {
+results.push(node);
+}
+});
+return results;
+};
+&gt;
+</pre>
+<p>Some languages offer the tail recursion optimization. This means that if a function
+returns the result of invoking itself recursively, then the invocation is replaced with a
+loop, which can significantly speed things up. Unfortunately, JavaScript does not
+currently provide tail recursion optimization. Functions that recurse very deeply can
+fail by exhausting the return stack:</p>
+<pre>
+&lt;
+// Make a factorial function with tail
+// recursion. It is tail recursive because
+// it returns the result of calling itself.
+// JavaScript does not currently optimize this form.
+var factorial = function factorial(i, a) {
+a = a || 1;
+if (i2) {
+return a;
+}
+return factorial(i - 1, a * i);
+};
+document.writeln(factorial(4)); // 24
+&gt;
+</pre>
+<h3>Scope</h3>
+<p>Scope in a programming language controls the visibility and lifetimes of variables and
+parameters. This is an important service to the programmer because it reduces nam-
+ing collisions and provides automatic memory management:</p>
+<pre>
+&lt;
+var foo = function ( ) {
+var a = 3, b = 5;
+var bar = function ( ) {
+var b = 7, c = 11;
+// At this point, a is 3, b is 7, and c is 11
+a += b + c;
+// At this point, a is 21, b is 7, and c is 11
+};
+// At this point, a is 3, b is 5, and c is not defined
+bar( );
+// At this point, a is 21, b is 5
+};
+&gt;
+</pre>
+<p>Most languages with C syntax have block scope. All variables defined in a block (a
+list of statements wrapped with curly braces) are not visible from outside of the
+block. The variables defined in a block can be released when execution of the block
+is finished. This is a good thing.</p>
+<p>Unfortunately, JavaScript does not have block scope even though its block syntax
+<p>suggests that it does. This confusion can be a source of errors.</p>
+JavaScript does have function scope. That means that the parameters and variables
+defined in a function are not visible outside of the function, and that a variable
+defined anywhere within a function is visible everywhere within the function.</p>
+<p>In many modern languages, it is recommended that variables be declared as late as
+possible, at the first point of use. That turns out to be bad advice for JavaScript
+because it lacks block scope. So instead, it is best to declare all of the variables used
+in a function at the top of the function body.</p>
+<h3>Closure</h3>
+<p>The good news about scope is that inner functions get access to the parameters and
+variables of the functions they are defined within (with the exception of this and
+arguments ). This is a very good thing.</p>
+<p>Our getElementsByAttribute function worked because it declared a results variable,
+and the inner function that it passed to walk_the_DOM also had access to the results
+variable.</p>
+<p> more interesting case is when the inner function has a longer lifetime than its outer
+function.</p>
+<p>Earlier, we made a myObject that had a value and an increment method. Suppose we
+wanted to protect the value from unauthorized changes.</p>
+<p>Instead of initializing myObject with an object literal, we will initialize myObject by
+calling a function that returns an object literal. That function defines a value vari-
+able. That variable is always available to the increment and getValue methods, but
+the function’s scope keeps it hidden from the rest of the program:</p>
+<pre>
+&lt;
+var myObject = function ( ) {
+var value = 0;
+return {
+increment: function (inc) {
+value += typeof inc === 'number' ? inc : 1;
+},
+getValue: function ( ) {
+return value;
+}
+};
+}( );
+&gt;
+</pre>
+<p>We are not assigning a function to myObject . We are assigning the result of invoking
+that function. Notice the ( ) on the last line. The function returns an object contain-
+ing two methods, and those methods continue to enjoy the privilege of access to the
+value variable.</p>
+<p>The Quo constructor from earlier in this chapter produced an object with a status
+property and a get_status method. But that doesn’t seem very interesting. Why
+would you call a getter method on a property you could access directly? It would be
+more useful if the status property were private. So, let’s define a different kind of quo
+function to do that:</p>
+<pre>
+&lt;
+// Create a maker function called quo. It makes an
+// object with a get_status method and a private
+// status property.
+var quo = function (status) {
+return {
+get_status: function ( ) {
+return status;
+}
+};
+};
+// Make an instance of quo.
+var myQuo = quo("amazed");
+document.writeln(myQuo.get_status( ));
+&gt;
+</pre>
+<P>This quo function is designed to be used without the new prefix, so the name is not
+capitalized. When we call quo , it returns a new object containing a get_status
+method. A reference to that object is stored in myQuo . The get_status method still
+has privileged access to quo ’s status property even though quo has already returned.
+get_status does not have access to a copy of the parameter; it has access to the
+parameter itself. This is possible because the function has access to the context in
+which it was created. This is called closure.</P>
+<P>Let’s look at a more useful example:</P>
+<pre>
+&lt;
+// Define a function that sets a DOM node's color
+// to yellow and then fades it to white.
+var fade = function (node) {
+var level = 1;
+var step = function ( ) {
+var hex = level.toString(16);
+node.style.backgroundColor = '#FFFF' + hex + hex;
+if (level < 15) {
+level += 1;
+setTimeout(step, 100);
+}
+};
+setTimeout(step, 100);
+};
+fade(document.body);
+We call fade , passing it document.body (the node created by the HTML <body> tag).
+&gt;
+</pre>	
+<p>fade sets level to 1. It defines a step function. It calls setTimeout , passing it the step
+function and a time (100 milliseconds). It then returns— fade has finished.</p>
+<p>Suddenly, about a 10th of a second later, the step function gets invoked. It makes a
+base 16 character from fade ’s level . It then modifies the background color of fade ’s
+node. It then looks at fade ’s level . If it hasn’t gotten to white yet, it then increments
+fade ’s level and uses setTimeout to schedule itself to run again.</p>
+<p>Suddenly, the step function gets invoked again. But this time, fade ’s level is 2. fade
+returned a while ago, but its variables continue to live as long as they are needed by
+one or more of fade ’s inner functions.</p>
+<p>It is important to understand that the inner function has access to the actual vari-
+ables of the outer functions and not copies in order to avoid the following problem:</p>
+<pre>
+&lt;
+// BAD EXAMPLE
+// Make a function that assigns event handler functions to an array of nodes the
+wrong way.
+// When you click on a node, an alert box is supposed to display the ordinal of the
+node.
+// But it always displays the number of nodes instead.
+var add_the_handlers = function (nodes) {
+var i;
+for (i = 0; i  nodes.length; i += 1) {
+nodes[i].onclick = function (e) {
+alert(i);
+};
+}
+};
+// END BAD EXAMPLE
+&gt;
+</pre>
+<p>The add_the_handlers function was intended to give each handler a unique number
+( i ). It fails because the handler functions are bound to the variable i , not the value of
+the variable i at the time the function was made:</p>
+<pre>
+&lt;
+// BETTER EXAMPLE
+// Make a function that assigns event handler functions to an array of nodes the
+right way.
+// When you click on a node, an alert box will display the ordinal of the node.
+var add_the_handlers = function (nodes) {
+var i;
+for (i = 0; i nodes.length; i += 1) {
+nodes[i].onclick = function (i) {
+return function (e) {
+alert(e);
+};
+}(i);
+}
+};
+&gt;
+</pre>
+<p>Now, instead of assigning a function to onclick , we define a function and immedi-
+ately invoke it, passing in i . That function will return an event handler function that
+is bound to the value of i that was passed in, not to the i defined in add_the_
+handlers . That returned function is assigned to onclick .</p>
+<h3>Callbacks</h3>
+<p>Functions can make it easier to deal with discontinuous events. For example, sup-
+pose there is a sequence that begins with a user interaction, making a request of the
+server, and finally displaying the server’s response. The naïve way to write that
+would be:</p>
+<pre>
+&lt;
+request = prepare_the_request( );
+response = send_request_synchronously(request);
+display(response);
+&gt;
+</pre>
+The problem with this approach is that a synchronous request over the network will
+leave the client in a frozen state. If either the network or the server is slow, the degra-
+dation in responsiveness will be unacceptable.
+A better approach is to make an asynchronous request, providing a callback func-
+tion that will be invoked when the server’s response is received. An asynchronous
+function returns immediately, so the client isn’t blocked:
+<pre>
+&lt;
+request = prepare_the_request( );
+send_request_asynchronously(request, function (response) {
+display(response);
+});&gt;
+</pre>
+<p>We pass a function parameter to the send_request_asynchronously function that will
+be called when the response is available.</p>
+<h3>Module</h3>
+<p>We can use functions and closure to make modules. A module is a function or object
+that presents an interface but that hides its state and implementation. By using func-
+tions to produce modules, we can almost completely eliminate our use of global vari-
+ables, thereby mitigating one of JavaScript’s worst features.</p>
+<p>For example, suppose we want to augment String with a deentityify method. Its
+job is to look for HTML entities in a string and replace them with their equivalents.
+It makes sense to keep the names of the entities and their equivalents in an object.
+But where should we keep the object? We could put it in a global variable, but glo-
+bal variables are evil. We could define it in the function itself, but that has a runtime
+cost because the literal must be evaluated every time the function is invoked. The
+ideal approach is to put it in a closure, and perhaps provide an extra method that can
+add additional entities:</p>
+<pre>
+&lt;
+String.method('deentityify', function ( ) {
+// The entity table. It maps entity names to
+// characters.
+var entity = {
+quot: '"',
+lt:
+gt:
+'<',
+'>'
+};
+// Return the deentityify method.
+return function ( ) {
+// This is the deentityify method. It calls the string
+// replace method, looking for substrings that start
+// with '&' and end with ';'. If the characters in
+// between are in the entity table, then replace the
+// entity with the character from the table. It uses
+// a regular expression.
+ return this.replace(/&([^&;]+);/g,
+function (a, b) {
+var r = entity[b];
+return typeof r === 'string' ? r : a;
+         }
+     );
+   };
+}( ));
+&gt;
+</pre>
+<p>Notice the last line. We immediately invoke the function we just made with the ( )
+operator. That invocation creates and returns the function that becomes the
+deentityify method.</p>
+<pre>
+&lt;
+document.writeln(
+'&lt;&quot;&gt;'.deentityify( ));
+// <">
+&gt;
+</pre>
+<p>The module pattern takes advantage of function scope and closure to create relation-
+ships that are binding and private. In this example, only the deentityify method has
+access to the entity data structure.</p>
+<p>The general pattern of a module is a function that defines private variables and func-
+tions; creates privileged functions which, through closure, will have access to the pri-
+vate variables and functions; and that returns the privileged functions or stores them
+in an accessible place.</p>
+<p>Use of the module pattern can eliminate the use of global variables. It promotes
+information hiding and other good design practices. It is very effective in encapsulat-
+ing applications and other singletons.</p>
+<p>It can also be used to produce objects that are secure. Let’s suppose we want to make
+an object that produces a serial number:</p>
+<pre>
+&lt;
+var serial_maker = function ( ) {
+// Produce an object that produces unique strings. A
+// unique string is made up of two parts: a prefix
+// and a sequence number. The object comes with
+// methods for setting the prefix and sequence
+// number, and a gensym method that produces unique
+// strings.
+var prefix = '';
+var seq = 0;
+return {
+set_prefix: function (p) {
+prefix = String(p);
+},
+set_seq: function (s) {
+seq = s;
+},
+gensym: function ( ) {
+var result = prefix + seq;
+seq += 1;
+return result;
+   }
+  };
+};
+var seqer = serial_maker( );
+seqer.set_prefix = ('Q';)
+seqer.set_seq = (1000);
+var unique = seqer.gensym( );
+// unique is "Q1000"
+&gt;
+</pre>
+<p>The methods do not make use of this or that . As a result, there is no way to com-
+promise the seqer . It isn’t possible to get or change the prefix or seq except as per-
+mitted by the methods. The seqer object is mutable, so the methods could be
+replaced, but that still does not give access to its secrets. seqer is simply a collection
+of functions, and those functions are capabilities that grant specific powers to use or
+modify the secret state.</p>
+<p>if we passed seqer.gensym to a third party’s function, that function would be able to
+generate unique strings, but would be unable to change the prefix or seq .</p>
+<h3>Cascade</h3>
+<p>Some methods do not have a return value. For example, it is typical for methods that
+set or change the state of an object to return nothing. If we have those methods
+return this instead of undefined , we can enable cascades. In a cascade, we can call
+many methods on the same object in sequence in a single statement. An Ajax library
+that enables cascades would allow us to write in a style like this:</p>
+<pre>
+&lt;
+getElement('myBoxDiv').
+move(350, 150).
+width(100).
+height(100).
+color('red').
+border('10px outset').
+padding('4px').
+appendText("Please stand by").
+on('mousedown', function (m) {
+this.startDrag(m, this.getNinth(m));
+}).
+on('mousemove', 'drag').
+on('mouseup', 'stopDrag').
+later(2000, function ( ) {
+this.
+color('yellow').
+setHTML("What hath God wraught?").
+slide(400, 40, 200, 200);
+}).
+tip('This box is resizeable');
+&gt;
+</pre>
+<p>In this example, the getElement function produces an object that gives functionality
+to the DOM element with id="myBoxDiv" . The methods allow us to move the ele-
+ment, change its dimensions and styling, and add behavior. Each of those methods
+returns the object, so the result of the invocation can be used for the next invocation.
+Cascading can produce interfaces that are very expressive. It can help control the ten-
+dency to make interfaces that try to do too much at once.</p>
+<h3>Curry</h3>
+<p>Functions are values, and we can manipulate function values in interesting ways.
+Currying allows us to produce a new function by combining a function and an
+argument:</p>
+<pre>
+&lt;
+var add1 = add.curry(1);
+document.writeln(add1(6));  // 7
+add1 is a function that was created by passing 1 to add ’s curry method. The add1
+function adds 1 to its argument. JavaScript does not have a curry method, but we
+can fix that by augmenting Function.prototype :
+Function.method('curry', function ( ) {
+var args = arguments, that = this;
+return function ( ) {
+return that.apply(null, args.concat(arguments));
+};
+});  // Something isn't right...
+&gt;
+</pre>
+<p>The curry method works by creating a closure that holds that original function and
+the arguments to curry. It returns a function that, when invoked, returns the result of
+calling that original function, passing it all of the arguments from the invocation of
+curry and the current invocation. It uses the Array concat method to concatenate the
+two arrays of arguments together.</p>
+<p>Unfortunately, as we saw earlier, the arguments array is not an array, so it does not
+have the concat method. To work around that, we will apply the array slice method
+on both of the arguments arrays. This produces arrays that behave correctly with the
+concat method:</p>
+<pre>
+&lt;
+Function.method('curry', function ( ) {
+var slice = Array.prototype.slice,
+args = slice.apply(arguments),
+that = this;
+return function ( ) {
+return that.apply(null, args.concat(slice.apply(arguments)));
+};
+});
+&gt;
+</pre>
+</p>
+<h3>Memoization</h3>
+<p>Functions can use objects to remember the results of previous operations, making it
+possible to avoid unnecessary work. This optimization is called memoization.
+JavaScript’s objects and arrays are very convenient for this.</p>
+<p>Let’s say we want a recursive function to compute Fibonacci numbers. A Fibonacci
+number is the sum of the two previous Fibonacci numbers. The first two are 0 and 1:</p>
+<pre>
+&lt;
+var fibonacci = function (n) {
+return n < 2 ? n : fibonacci(n - 1) + fibonacci(n - 2);
+};
+for (var i = 0; i <= 10; i += 1) {
+document.writeln('// ' + i + ': ' + fibonacci(i));
+}
+&gt;
+</pre>
+
+<pre>
+&lt;
+// 0: 0
+// 1: 1
+// 2: 1
+// 3: 2
+// 4: 3
+// 5: 5
+// 6: 8
+// 7: 13
+// 8: 21
+// 9: 34
+// 10: 55
+&gt;
+</pre>
+<p>This works, but it is doing a lot of unnecessary work. The fibonacci function is
+called 453 times. We call it 11 times, and it calls itself 442 times in computing values
+that were probably already recently computed. If we memoize the function, we can
+significantly reduce its workload.</p>
+<p>We will keep our memoized results in a memo array that we can hide in a closure.
+When our function is called, it first looks to see if it already knows the result. If it
+does, it can immediately return it:</p>
+<pre>
+&lt;
+var fibonacci = function ( ) {
+var memo = [0, 1];
+var fib = function (n) {
+var result = memo[n];
+if (typeof result !== 'number') {
+result = fib(n - 1) + fib(n - 2);
+memo[n] = result;
+}
+return result;
+};
+return fib;
+}( );
+&gt;
+</pre>
+<p>This function returns the same results, but it is called only 29 times. We called it 11
+times. It called itself 18 times to obtain the previously memoized results.
+We can generalize this by making a function that helps us make memoized func-
+tions. The memoizer function will take an initial memo array and the fundamental func-
+tion. It returns a shell function that manages the memo store and that calls the
+fundamental function as needed. We pass the shell function and the function’s
+parameters to the fundamental function:</p>
+<pre>
+&lt;
+var memoizer = function (memo, fundamental) {
+var shell = function (n) {
+var result = memo[n];
+if (typeof result !== 'number') {
+result = fundamental(shell, n);
+memo[n] = result;
+}
+return result;
+};
+return shell;
+};
+We can now define fibonacci with the memoizer, providing the initial memo array and
+fundamental function:
+var fibonacci = memoizer([0, 1], function (shell, n) {
+return shell(n - 1) + shell(n - 2);
+});
+&gt;
+</pre>
+<p>By devising functions that produce other functions, we can significantly reduce the
+amount of work we have to do. For example, to produce a memoizing factorial func-
+tion, we only need to supply the basic factorial formula:</P>
+<pre>
+&lt;
+var factorial = memoizer([1, 1], function (shell, n) {
+return n * shell(n - 1);
+});
+&gt;
+</pre></p>
+<h3>Inheritance</h3>
+<p>Inheritance is an important topic in most programming languages.
+In the classical languages (such as Java), inheritance (or extends ) provides two useful
+services. First, it is a form of code reuse. If a new class is mostly similar to an existing
+class, you only have to specify the differences. Patterns of code reuse are extremely
+important because they have the potential to significantly reduce the cost of soft-
+ware development. The other benefit of classical inheritance is that it includes the
+specification of a system of types. This mostly frees the programmer from having to
+write explicit casting operations, which is a very good thing because when casting,
+the safety benefits of a type system are lost.</p>
+<p>JavaScript, being a loosely typed language, never casts. The lineage of an object is
+irrelevant. What matters about an object is what it can do, not what it is descended
+from.</p>
+<p>JavaScript provides a much richer set of code reuse patterns. It can ape the classical
+pattern, but it also supports other patterns that are more expressive. The set of possi-
+ble inheritance patterns in JavaScript is vast. In this chapter, we’ll look at a few of the
+most straightforward patterns. Much more complicated constructions are possible,
+but it is usually best to keep it simple.</p>
+<p>In classical languages, objects are instances of classes, and a class can inherit from
+another class. JavaScript is a prototypal language, which means that objects inherit
+directly from other objects.</p>
+<h3>Pseudoclassical</h3>
+<p>JavaScript is conflicted about its prototypal nature. Its prototype mechanism is
+obscured by some complicated syntactic business that looks vaguely classical.
+Instead of having objects inherit directly from other objects, an unnecessary level of
+indirection is inserted such that objects are produced by constructor functions.
+When a function object is created, the Function constructor that produces the func-
+tion object runs some code like this:</p>
+this.prototype = {constructor: this};</p>
+<p>The new function object is given a prototype property whose value is an object con-
+taining a constructor property whose value is the new function object. The
+prototype object is the place where inherited traits are to be deposited. Every func-
+tion gets a prototype object because the language does not provide a way of deter-
+mining which functions are intended to be used as constructors. The constructor
+<p>property is not useful. It is the prototype object that is important.</p>
+When a function is invoked with the constructor invocation pattern using the new
+prefix, this modifies the way in which the function is executed. If the new operator
+were a method instead of an operator, it could have been implemented like this:</p>
+<pre>
+&lt;
+Function.method('new', function ( ) {
+// Create a new object that inherits from the
+// constructor's prototype.
+var that = Object.create(this.prototype);
+// Invoke the constructor, binding –this- to
+// the new object.
+var other = this.apply(that, arguments);
+// If its return value isn't an object,
+// substitute the new object.
+return (typeof other === 'object' && other) || that;
+});
+&gt;
+</pre>
+We can define a constructor and augment its prototype :
+<pre>
+&lt;
+var Mammal = function (name) {
+this.name = name;
+};
+Mammal.prototype.get_name = function ( ) {
+return this.name;
+};
+Mammal.prototype.says = function ( ) {
+return this.saying || '';
+};
+&gt;
+</pre>
+Now, we can make an instance:
+<pre>
+&lt;
+var myMammal = new Mammal('Herb the Mammal');
+var name = myMammal.get_name( ); // 'Herb the Mammal'
+&gt;
+</pre>
+We can make another pseudoclass that inherits from Mammal by defining its
+constructor function and replacing its prototype with an instance of Mammal :
+<pre>
+&lt;
+var Cat = function (name) {
+this.name = name;
+this.saying = 'meow';
+};
+// Replace Cat.prototype with a new instance of Mammal
+Cat.prototype = new Mammal( );
+// Augment the new prototype with
+// purr and get_name methods.
+Cat.prototype.purr = function (n) {
+var i, s = '';
+for (i = 0; i < n; i += 1) {
+if (s) {
+s += '-';
+}
+s += 'r';
+}
+return s;
+};
+Cat.prototype.get_name = function ( ) {
+return this.says( ) + ' ' + this.name +
+' ' + this.says( );
+};
+&gt;
+</pre>
+<pre>
+&lt;
+var myCat = new Cat('Henrietta');
+var says = myCat.says( ); // 'meow'
+var purr = myCat.purr(5); // 'r-r-r-r-r'
+var name = myCat.get_name( );
+ //'meow Henrietta meow'
+&gt;
+</pre>
+<p>The pseudoclassical pattern was intended to look sort of object-oriented, but it is
+looking quite alien. We can hide some of the ugliness by using the method method
+and defining an inherits method:</p>
+<pre>
+&lt;Function.method('inherits', function (Parent) {
+this.prototype = new Parent( );
+return this;
+});
+&gt;
+</pre>
+<p>Our inherits and method methods return this , allowing us to program in a cascade
+style. We can now make our Cat with one statement.</p>
+<pre>
+&lt;
+var Cat = function (name) {
+this.name = name;
+this.saying = 'meow';
+}.
+inherits(Mammal).
+method('purr', function (n) {
+var i, s = '';
+for (i = 0; i < n; i += 1) {
+if (s) {
+s += '-';
+}
+s += 'r';
+}
+return s;
+}).
+method('get_name', function ( ) {
+return this.says( ) + ' ' + this.name +
+' ' + this.says( );
+});
+&gt;
+</pre>
+<p>By hiding the prototype jazz, it now looks a bit less alien. But have we really
+improved anything? We now have constructor functions that act like classes, but at
+the edges, there may be surprising behavior. There is no privacy; all properties are
+public. There is no access to super methods.</p>
+<p>Even worse, there is a serious hazard with the use of constructor functions. If you
+forget to include the new prefix when calling a constructor function, then this will
+not be bound to a new object. Sadly, this will be bound to the global object, so
+instead of augmenting your new object, you will be clobbering global variables. That
+is really bad. There is no compile warning, and there is no runtime warning.
+This is a serious design error in the language. To mitigate this problem, there is a
+convention that all constructor functions are named with an initial capital, and that
+nothing else is spelled with an initial capital. This gives us a prayer that visual inspec-
+tion can find a missing new . A much better alternative is to not use new at all.</p>
+<p>The pseudoclassical form can provide comfort to programmers who are unfamiliar
+with JavaScript, but it also hides the true nature of the language. The classically
+inspired notation can induce programmers to compose hierarchies that are unneces-
+sarily deep and complicated. Much of the complexity of class hierarchies is moti-
+vated by the constraints of static type checking. JavaScript is completely free of those
+constraints. In classical languages, class inheritance is the only form of code reuse.
+JavaScript has more and better options.</p>
+<h3>Object Specifiers</h3>
+<p>It sometimes happens that a constructor is given a very large number of parameters.
+This can be troublesome because it can be very difficult to remember the order of the
+arguments. In such cases, it can be much friendlier if we write the constructor to
+accept a single object specifier instead. That object contains the specification of the
+object to be constructed. So, instead of:</p>
+<pre>
+&lt;
+var myObject = maker(f, l, m, c, s);
+we can write:
+var myObject = maker({
+first: f,
+last: l,
+state: s,
+city: c
+});
+&gt;
+</pre>
+<p>The arguments can now be listed in any order, arguments can be left out if the con-
+structor is smart about defaults, and the code is much easier to read.
+This can have a secondary benefit when working with JSON (see Appendix E). JSON
+text can only describe data, but sometimes the data represents an object, and it
+would be useful to associate the data with its methods. This can be done trivially if
+the constructor takes an object specifier because we can simply pass the JSON object
+to the constructor and it will return a fully constituted object.</p>
+<h3>Prototypal</h3>
+<p>In a purely prototypal pattern, we dispense with classes. We focus instead on the
+objects. Prototypal inheritance is conceptually simpler than classical inheritance: a
+new object can inherit the properties of an old object. This is perhaps unfamiliar, but
+it is really easy to understand. You start by making a useful object. You can then
+make many more objects that are like that one. The classification process of break-
+ing an application down into a set of nested abstract classes can be completely
+avoided.</p>
+Let’s start by using an object literal to make a useful object:
+<pre>
+&lt;
+var myMammal = {
+name : 'Herb the Mammal',
+get_name : function ( ) {
+return this.name;
+},
+says : function ( ) {
+return this.saying || '';
+}
+};
+&gt;
+</pre>
+Once we have an object that we like, we can make more instances with the Object.
+create method from Chapter 3. We can then customize the new instances:
+<pre>
+&lt;
+var myCat = Object.create(myMammal);
+myCat.name = 'Henrietta';
+myCat.saying = 'meow';
+myCat.purr = function (n) {
+var i, s = '';
+for (i = 0; i < n; i += 1) {
+if (s) {
+s += '-';
+}
+s += 'r';
+}
+return s;
+};
+myCat.get_name = function ( ) {
+return this.says( ) + ' ' + this.name + ' ' + this.says( );
+};
+&gt;
+</pre>
+<p>This is differential inheritance. By customizing a new object, we specify the differ-
+ences from the object on which it is based.</p>
+<p>Sometimes is it useful for data structures to inherit from other data structures. Here
+is an example: Suppose we are parsing a language such as JavaScript or T E X in which
+a pair of curly braces indicates a scope. Items defined in a scope are not visible out-
+side of the scope. In a sense, an inner scope inherits from its outer scope. JavaScript
+objects are very good at representing this relationship. The block function is called
+when a left curly brace is encountered. The parse function will look up symbols from
+scope , and augment scope when it defines new symbols:</p>
+<pre>
+&lt;
+var block = function ( ) {
+// Remember the current scope. Make a new scope that
+// includes everything from the current one.
+var oldScope = scope;
+scope = Object.create(scope);
+// Advance past the left curly brace.
+advance('{');
+// Parse using the new scope.
+parse(scope);
+// Advance past the right curly brace and discard the
+// new scope, restoring the old one.
+advance('}');
+scope = oldScope;
+};
+&gt;
+</pre></p>
+<h3>Functional</h3>
+<P>One weakness of the inheritance patterns we have seen so far is that we get no pri-
+vacy. All properties of an object are visible. We get no private variables and no
+private methods. Sometimes that doesn’t matter, but sometimes it matters a lot. In
+frustration, some uninformed programmers have adopted a pattern of pretend
+privacy. If they have a property that they wish to make private, they give it an odd-
+looking name, with the hope that other users of the code will pretend that they can-
+not see the odd looking members. Fortunately, we have a much better alternative in
+an application of the module pattern.</p>
+<p>We start by making a function that will produce objects. We will give it a name that
+starts with a lowercase letter because it will not require the use of the new prefix. The
+function contains four steps:</p>
+<p>1. It creates a new object. There are lots of ways to make an object. It can make an
+object literal, or it can call a constructor function with the new prefix, or it can
+use the Object.create method to make a new instance from an existing object,
+or it can call any function that returns an object.</p>
+<p>2. It optionally defines private instance variables and methods. These are just ordi-
+nary var s of the function.</p>
+<p>3. It augments that new object with methods. Those methods will have privileged
+access to the parameters and the var s defined in the second step.
+4. It returns that new object.</p>
+<p>Here is a pseudocode template for a functional constructor (boldface text added for
+emphasis):</p>
+<p>var constructor = function (spec, my) {</p>
+<p>var that, other private instance variables;</p>
+<p>my = my || {};</p>
+<p>Add shared variables and functions to my</p>
+<p>that = a new object;</p>
+<p>Add privileged methods to that</p>
+<p>return that;</p>
+<p>};</p>
+<p>The spec object contains all of the information that the constructor needs to make an
+instance. The contents of the spec could be copied into private variables or trans-
+formed by other functions. Or the methods can access information from spec as they
+need it. (A simplification is to replace spec with a single value. This is useful when
+the object being constructed does not need a whole spec object.)</p>
+<p>The my object is a container of secrets that are shared by the constructors in the
+inheritance chain. The use of the my object is optional. If a my object is not passed in,
+then a my object is made.</p>
+<p>Next, declare the private instance variables and private methods for the object. This
+is done by simply declaring variables. The variables and inner functions of the
+constructor become the private members of the instance. The inner functions have
+access to spec and my and that and the private variables.</p>
+Next, add the shared secrets to the my object. This is done by assignment:
+my.member = value;</p>
+<p>Now, we make a new object and assign it to that . There are lots of ways to make a
+new object. We can use an object literal. We can call a pseudoclassical constructor
+with the new operator. We can use the Object.create method on a prototype object.</p>
+<p>Or, we can call another functional constructor, passing it a spec object (possibly the
+same spec object that was passed to this constructor) and the my object. The my object
+allows the other constructor to share the material that we put into my . The other con-
+structor may also put its own shared secrets into my so that our constructor can take
+advantage of it.</p>
+<p>Next, we augment that , adding the privileged methods that make up the object’s
+interface. We can assign new functions to members of that . Or, more securely, we
+can define the functions first as private methods, and then assign them to that :</p>
+<pre>
+&lt;
+var methodical = function ( ) {
+...
+};
+that.methodical = methodical;
+&gt;
+</pre>
+<p>The advantage to defining methodical in two steps is that if other methods want to
+call methodical , they can call methodical( ) instead of that.methodical( ) . If the
+instance is damaged or tampered with so that that.methodical is replaced, the meth-
+ods that call methodical will continue to work the same because their private
+methodical is not affected by modification of the instance.</p>
+<p>Finally, we return that .</p>
+<p>Let’s apply this pattern to our mammal example. We don’t need my here, so we’ll just
+leave it out, but we will use a spec object.</p>
+<p>The name and saying properties are now completely private. They are accessible only
+via the privileged get_name and says methods:</p>
+<pre>
+&lt;
+var mammal = function (spec) {
+var that = {};
+that.get_name = function ( ) {
+return spec.name;
+};
+that.says = function ( ) {
+return spec.saying || '';
+};
+return that;
+};
+var myMammal = mammal({name: 'Herb'});
+&gt;
+</pre>
+<p>In the pseudoclassical pattern, the Cat constructor function had to duplicate work
+that was done by the Mammal constructor. That isn’t necessary in the functional pattern
+because the Cat constructor will call the Mammal constructor, letting Mammal do most of
+the work of object creation, so Cat only has to concern itself with the differences:</p>
+<pre>
+&lt;
+var cat = function (spec) {
+spec.saying = spec.saying || 'meow';
+var that = mammal(spec);
+that.purr = function (n) {
+var i, s = '';
+for (i = 0; i < n; i += 1) {
+if (s) {
+s += '-';
+}
+s += 'r';
+}
+return s;
+};
+that.get_name = function ( ) {
+return that.says( ) + ' ' + spec.name +
+' ' + that.says( );
+return that;
+};
+var myCat = cat({name: 'Henrietta'});
+&gt;
+</pre>
+<p>The functional pattern also gives us a way to deal with super methods. We will make
+a superior method that takes a method name and returns a function that invokes
+that method. The function will invoke the original method even if the property is
+changed:</p>
+<pre>
+&lt;
+Object.method('superior', function (name) {
+var that = this,
+method = that[name];
+return function ( ) {
+return method.apply(that, arguments);
+};
+});
+&gt;
+</pre>
+<p>Let’s try it out on a coolcat that is just like cat except it has a cooler get_name
+method that calls the super method. It requires just a little bit of preparation. We
+will declare a super_get_name variable and assign it the result of invoking the supe-
+rior method:</p>
+<pre>
+&lt;
+var coolcat = function (spec) {
+var that = cat(spec),
+super_get_name = that.superior('get_name');
+that.get_name = function (n) {
+return 'like ' + super_get_name( ) + ' baby';
+};
+return that;
+};
+var myCoolCat = coolcat({name: 'Bix'});
+var name = myCoolCat.get_name( );
+// 'like meow Bix meow baby'
+&gt;
+</pre>
+The functional pattern has a great deal of flexibility. It requires less effort than the
+pseudoclassical pattern, and gives us better encapsulation and information hiding
+and access to super methods.
+<p>If all of the state of an object is private, then the object is tamper-proof. Properties of
+the object can be replaced or deleted, but the integrity of the object is not compro-
+mised. If we create an object in the functional style, and if all of the methods of the
+object make no use of this or that , then the object is durable. A durable object is
+simply a collection of functions that act as capabilities.</p>
+<p>A durable object cannot be compromised. Access to a durable object does not give
+an attacker the ability to access the internal state of the object except as permitted by
+the methods.</P>
+<h3>Parts</h3>
+<P>We can compose objects out of sets of parts. For example, we can make a function
+that can add simple event processing features to any object. It adds an on method, a
+fire method, and a private event registry:</p>
+<pre>
+&lt;
+var eventuality = function (that) {
+var registry = {};
+that.fire = function (event) {
+
+// Fire an event on an object. The event can be either
+// a string containing the name of the event or an
+// object containing a type property containing the
+// name of the event. Handlers registered by the 'on'
+// method that match the event name will be invoked.
+   var array,
+    func,
+    handler,
+       i,
+     type = typeof event === 'string' ?
+            event : event.type;
+
+// loop through it and execute the handlers in order.
+
+if (registry.hasOwnProperty(type)) {
+array = registry[type];
+for (i = 0; i < array.length; i += 1) {
+handler = array[i];
+
+// A handler record contains a method and an optional
+// array of parameters. If the method is a name, look
+// up the function.
+
+func = handler.method;
+if (typeof func === 'string') {
+func = this[func];
+}
+
+// Invoke a handler. If the record contained
+// parameters, then pass them. Otherwise, pass the
+// event object.
+
+func.apply(this,
+handler.parameters || [event]);
+}
+}
+return this;
+};
+that.on = function (type, method, parameters) {
+
+// Register an event. Make a handler record. Put it
+// in a handler array, making one if it doesn't yet
+// exist for this type.
+
+var handler = {
+method: method,
+parameters: parameters
+};
+if (registry.hasOwnProperty(type)) {
+registry[type].push(handler);
+} else {
+registry[type] = [handler];
+}
+return this;
+};
+return that;
+};
+&gt;
+</pre>
+<p>We could call eventuality on any individual object, bestowing it with event handling
+methods. We could also call it in a constructor function before that is returned:
+eventuality(that);</p>
+<p> InheritanceIn this way, a constructor could assemble objects from a set of parts. JavaScript’s
+loose typing is a big benefit here because we are not burdened with a type system
+that is concerned about the lineage of classes. Instead, we can focus on the character
+of their contents.</p>
+<p>If we wanted eventuality to have access to the object’s private state, we could pass it
+the my bundle.</P>
+<h3>Arrays</h3>
+<P>An array is a linear allocation of memory in which elements are accessed by inte-
+gers that are used to compute offsets. Arrays can be very fast data structures. Unfor-
+tunately, JavaScript does not have anything like this kind of array.</p>
+<p>Instead, JavaScript provides an object that has some array-like characteristics. It con-
+verts array subscripts into strings that are used to make properties. It is significantly
+slower than a real array, but it can be more convenient to use. Retrieval and updat-
+ing of properties work the same as with objects, except that there is a special trick
+with integer property names. Arrays have their own literal format. Arrays also have a
+much more useful set of built-in method.</P>
+<h3>Array Literals</h3>
+<P>Array literals provide a very convenient notation for creating new array values. An
+array literal is a pair of square brackets surrounding zero or more values separated by
+commas. An array literal can appear anywhere an expression can appear. The first
+value will get the property name '0' , the second value will get the property name
+'1' , and so on:
+<pre>
+&lt;
+var empty =[];
+var numbers= [
+'zero','one', 'two', 'three', 'four',
+'five','six', 'seven', 'eight', 'nine'
+];
+empty[1]    // 'one'
+numbers[1] // undefined
+empty.length // 0
+numbers.length // 10
+<p>The object literal:</p>
+var numbers_object = {
+'0': 'zero', '1': 'one','2': 'two',
+'3': 'three', '4': 'four', '5': 'five',
+'6': 'six','7': 'seven', '8': 'eight',
+'9': 'nine'
+};
+&gt;
+</pre>
+<p>produces a similar result. Both numbers and number_object are objects containing 10
+properties, and those properties have exactly the same names and values. But there
+are also significant differences. numbers inherits from Array.prototype , whereas
+number_object inherits from Object.prototype , so numbers inherits a larger set of use-
+ful methods. Also, numbers gets the mysterious length property, while number_object
+does not.</p>
+<p>In most languages, the elements of an array are all required to be of the same type.
+JavaScript allows an array to contain any mixture of values:</p>
+<pre>
+&lt;
+var misc = [
+'string', 98.6, true, false, null, undefined,
+['nested', 'array'], {object: true}, NaN,
+Infinity
+];
+misc.length // 10
+&gt;
+</pre>
+</P>
+<h3>Length</h3>
+<P>Every array has a length property. Unlike most other languages, JavaScript’s array
+length is not an upper bound. If you store an element with a subscript that is greater
+than or equal to the current length , the length will increase to contain the new ele-
+ment. There is no array bounds error.
+The length property is the largest integer property name in the array plus one. This is
+not necessarily the number of properties in the array:
+<pre>
+&lt;
+var myArray = [];
+
+myArray.length  // 0
+
+myArray[1000000] = true;
+
+myArray.length   // 1000001
+
+// myArray contains one property.
+&gt;
+</pre>
+<p>The [] postfix subscript operator converts its expression to a string using the expres-
+sion’s toString method if it has one. That string will be used as the property name. If
+the string looks like a positive integer that is greater than or equal to the array’s cur-
+rent length and is less than 4,294,967,295, then the length of the array is set to the
+new subscript plus one.</p>
+<p>The length can be set explicitly. Making the length larger does not allocate more
+space for the array. Making the length smaller will cause all properties with a sub-
+script that is greater than or equal to the new length to be deleted:</p>
+<pre>
+&lt;
+numbers.length = 3;
+  // numbers is ['zero', 'one', 'two']
+&gt;
+</pre>
+A new element can be appended to the end of an array by assigning to the array’s
+current length :
+<pre>
+&lt;
+numbers[numbers.length] = 'shi';
+  // numbers is ['zero', 'one', 'two', 'shi']
+&gt;
+</pre>
+It is sometimes more convenient to use the push method to accomplish the same
+thing:
+<pre>
+&lt;
+numbers.push('go');
+  // numbers is ['zero', 'one', 'two', 'shi', 'go']
+&gt;
+</pre>
+</P>
+<h3>Delete</h3>
+<P>Since JavaScript’s arrays are really objects, the delete operator can be used to remove
+elements from an array:</p>
+<pre>
+&lt;
+delete numbers[2];
+  // numbers is ['zero', 'one', undefined, 'shi', 'go']
+&gt;
+</pre>
+Unfortunately, that leaves a hole in the array. This is because the elements to the
+right of the deleted element retain their original names. What you usually want is to
+decrement the names of each of the elements to the right.
+Fortunately, JavaScript arrays have a splice method. It can do surgery on an array,
+deleting some number of elements and replacing them with other elements. The first
+argument is an ordinal in the array. The second argument is the number of elements
+to delete. Any additional arguments get inserted into the array at that point:
+<pre>
+&lt;
+numbers.splice(2, 1);
+  // numbers is ['zero', 'one', 'shi', 'go']
+&gt;
+</pre>
+<p>The property whose value is 'shi' has its key changed from '4' to '3' . Because every
+property after the deleted property must be removed and reinserted with a new key,
+this might not go quickly for large arrays.</P>
+<h3>Enumeration</h3>
+<P>Since JavaScript’s arrays are really objects, the for in statement can be used to iter-
+ate over all of the properties of an array. Unfortunately, for in makes no guarantee
+about the order of the properties, and most array applications expect the elements to
+be produced in numerical order. Also, there is still the problem with unexpected
+properties being dredged up from the prototype chain.</p>
+<p>Fortunately, the conventional for statement avoids these problems. JavaScript’s for
+statement is similar to that in most C-like languages. It is controlled by three
+clauses—the first initializes the loop, the second is the while condition, and the third
+does the increment:</p>
+<pre>
+&lt;
+var i;
+for (i = 0; i < myArray.length; i += 1) {
+document.writeln(myArray[i]);
+}
+&gt;
+</pre>
+</P>
+<h3>Confusion</h3>
+<P>A common error in JavaScript programs is to use an object when an array is required
+or an array when an object is required. The rule is simple: when the property names
+are small sequential integers, you should use an array. Otherwise, use an object.</p>
+<p>JavaScript itself is confused about the difference between arrays and objects. The
+typeof operator reports that the type of an array is 'object' , which isn’t very helpful.
+JavaScript does not have a good mechanism for distinguishing between arrays and
+objects. We can work around that deficiency by defining our own is_array function:</p>
+<pre>
+&lt;
+var is_array = function (value) {
+return value &&
+typeof value === 'object' &&
+value.constructor === Array;
+};
+&gt;
+</pre>
+Unfortunately, it fails to identify arrays that were constructed in a different window
+or frame. If we want to accurately detect those foreign arrays, we have to work a lit-
+tle harder:
+<pre>
+&lt;
+var is_array = function (value) {
+return value &&
+typeof value === 'object' &&
+typeof value.length === 'number' &&
+typeof value.splice === 'function' &&
+!(value.propertyIsEnumerable('length'));
+};
+&gt;
+</pre>
+<p>First, we ask if the value is truthy. We do this to reject null and other falsy values.
+Second, we ask if the typeof value is 'object' . This will be true for objects, arrays,
+and (weirdly) null . Third, we ask if the value has a length property that is a number.
+This will always be true for arrays, but usually not for objects. Fourth, we ask if the
+value contains a splice method. This again will be true for all arrays. Finally, we ask
+if the length property is enumerable (will length be produced by a for in loop?).
+That will be false for all arrays. This is the most reliable test for arrayness that I have
+found. It is unfortunate that it is so complicated.</p>
+<p>Having such a test, it is possible to write functions that do one thing when passed a
+single value and lots of things when passed an array of values.</P>
+<h3>Methods</h3>
+<p>JavaScript provides a set of methods for acting on arrays. The methods are functions
+stored in Array.prototype . we saw that Object.prototype can be aug-
+mented. Array.prototype can be augmented as well.</p>
+<p>For example, suppose we want to add an array method that will allow us to do com-
+putation on an array:</p>
+<pre>
+&lt;
+Array.method('reduce', function (f, value) {
+var i;
+for (i = 0; i < this.length; i += 1) {
+value = f(this[i], value);
+}
+return value;
+});
+&gt;
+</pre>
+<p>By adding a function to Array.prototype , every array inherits the method. In this
+case, we defined a reduce method that takes a function and a starting value. For each
+element of the array, it calls the function with an element and the value, and com-
+putes a new value. When it is finished, it returns the value. If we pass in a function
+that adds two numbers, it computes the sum. If we pass in a function that multiplies
+two numbers, it computes the product:</p>
+<pre>
+&lt;
+// Create an array of numbers.
+var data = [4, 8, 15, 16, 23, 42];
+// Define two simple functions. One will add two
+// numbers. The other will multiply two numbers.
+var add = function (a, b) {
+return a + b;
+};
+var mult = function (a, b) {
+return a * b;
+};
+// Invoke the data's reduce method, passing in the
+// add function.
+var sum = data.reduce(add, 0);
+// sum is 108
+// Invoke the reduce method again, this time passing
+// in the multiply function.
+var product = data.reduce(mult, 1);
+// product is 7418880
+Because an array is really an object, we can add methods directly to an individual
+array:
+// Give the data array a total function.
+data.total = function ( ) {
+return this.reduce(add, 0);
+};
+total = data.total( );  // total is 108
+&gt;
+</pre>
+<p>Since the string 'total' is not an integer, adding a total property to an array does
+not change its length. Arrays are most useful when the property names are integers,
+but they are still objects, and objects can accept any string as a property name.
+It is not useful to use the Object.create method from on arrays because it
+produces an object, not an array. The object produced will inherit the array’s values
+and methods, but it will not have the special length property.</p>
+<h3>Dimensions</h3>
+<p>JavaScript arrays usually are not initialized. If you ask for a new array with [] , it will
+be empty. If you access a missing element, you will get the undefined value. If you are
+aware of that, or if you will naturally set every element before you attempt to retrieve
+it, then all is well. But if you are implementing algorithms that assume that every ele-
+ment starts with a known value (such as 0), then you must prep the array yourself.
+JavaScript should have provided some form of an Array.dim method to do this, but
+we can easily correct this oversight:</P>
+<pre>
+&lt;
+Array.dim = function (dimension, initial) {
+var a = [], i;
+for (i = 0; i < dimension; i += 1) {
+a[i] = initial;
+}
+return a;
+};
+// Make an array containing 10 zeros.
+var myArray = Array.dim(10, 0);
+JavaScript does not have arrays of more than one dimension, but like most C lan-
+guages, it can have arrays of arrays:
+var matrix = [
+[0, 1, 2],
+[3, 4, 5],
+[6, 7, 8]
+];
+matrix[2][1]  // 7
+To make a two-dimensional array or an array of arrays, you must build the arrays
+yourself:
+for (i = 0; i < n; i += 1) {
+my_array[i] = [];
+}
+// Note: Array.dim(n, []) will not work here.
+// Each element would get a reference to the same
+// array, which would be very bad.
+The cells of an empty matrix will initially have the value undefined . If you want them
+to have a different initial value, you must explicitly set them. Again, JavaScript
+should have provided better support for matrixes. We can correct that, too:
+Array.matrix = function (m, n, initial) {
+var a, i, j, mat = [];
+for (i = 0; i < m; i += 1) {
+a = [];
+for (j = 0; j < n; j += 1) {
+a[j] = initial;
+}
+mat[i] = a;
+}
+return mat;
+};
+// Make a 4 * 4 matrix filled with zeros.
+var myMatrix = Array.matrix(4, 4, 0);
+document.writeln(myMatrix[3][3]);
+// 0
+// Method to make an identity matrix.
+Array.identity = function (n) {
+var i, mat = Array.matrix(n, n, 0);
+for (i = 0; i < n; i += 1) {
+mat[i][i] = 1;
+}
+return mat;
+};
+myMatrix = Array.identity(4);
+document.writeln(myMatrix[3][3]); 
+&gt;
+</pre>
+</p>
+<h3><Regular Expressions></h3>
+<p>Many of JavaScript’s features were borrowed from other languages. The syntax came
+from Java, functions came from Scheme, and prototypal inheritance came from Self.
+JavaScript’s Regular Expression feature was borrowed from Perl.</p>
+<p>A regular expression is the specification of the syntax of a simple language. Regular
+expressions are used with methods to search, replace, and extract information from
+strings. The methods that work with regular expressions are regexp.exec , regexp.test ,
+string.match , string.replace , string.search , and string.split . These will all be
+described in Chapter 8. Regular expressions usually have a significant performance
+advantage over equivalent string operations in JavaScript.</p>
+<p>Regular expressions came from the mathematical study of formal languages. Ken
+Thompson adapted Stephen Kleene’s theoretical work on type-3 languages into a
+practical pattern matcher that could be embedded in tools such as text editors and
+programming languages.</p>
+<p>The syntax of regular expressions in JavaScript conforms closely to the original for-
+mulations from Bell Labs, with some reinterpretation and extension adopted from
+Perl. The rules for writing regular expressions can be surprisingly complex because
+they interpret characters in some positions as operators, and in slightly different
+positions as literals. Worse than being hard to write, this makes regular expressions
+hard to read and dangerous to modify. It is necessary to have a fairly complete
+understanding of the full complexity of regular expressions to correctly read them.</p>
+<p>Today’s regular expressions are not strictly regular, but they can be very useful. Reg-
+ular expressions tend to be extremely terse, even cryptic. They are easy to use in their
+simplest form, but they can quickly become bewildering. JavaScript’s regular expres-
+sions are difficult to read in part because they do not allow comments or whitespace.
+All of the parts of a regular expression are pushed tightly together, making them
+almost indecipherable. This is a particular concern when they are used in security
+applications for scanning and validation. If you cannot read and understand a regu-
+lar expression, how can you have confidence that it will work correctly for all inputs?
+Yet, despite their obvious drawbacks, regular expressions are widely used.</p>
+<h3>Construction</h3>
+<p>There are two ways to make a RegExp object. The preferred way, as we saw in the
+examples, is to use a regular expression literal.
+Regular expression literals are enclosed in slashes. This can be a little tricky because
+slash is also used as the division operator and in comments.
+There are three flags that can be set on a RegExp . They are indicated by the letters g ,
+i , and m , as listed in below. The flags are appended directly to the end of the
+RegExp literal:
+// Make a regular expression object that matches
+// a JavaScript string.
+var my_regexp = /"(?:\\.|[^\\\"])*"/g;
+<table border="1px">
+<tr><td>g</td><td>global (match multiple times; the precise meaning of this varies with the method)</td><tr>
+<tr><td>i</td><td>Insensitive (ignore character case)</td><tr>
+<tr><td>m </td><td>Multiline (^ and $ can match line-ending characters)</td><tr>
+</table>
+<p>
+The other way to make a regular expression is to use the RegExp constructor. The
+constructor takes a string and compiles it into a RegExp object. Some care must be
+taken in building the string because backslashes have a somewhat different meaning
+in regular expressions than in string literals. It is usually necessary to double the
+backslashes and escape the quotes:</p>
+<pre> 
+&lt;
+// Make a regular expression object that matches
+// a JavaScript string.
+var my_regexp =
+new RegExp("\"(?:\\.|[^\\\\\\\"])*\"", 'g')>
+&gt;
+</pre>
+<p>The second parameter is a string specifying the flags. The RegExp constructor is use-
+ful when a regular expression must be generated at runtime using material that is not
+available to the programmer.</p>
+<table border="1px">
+<tr><td>global</td><td>True if the g flag was used.</td><tr>
+<tr><td>ignoreCase</td><td>True if the i flag was used.</td><tr>
+<tr><td>lastIndex</td><td>The index at which to start the next exec match. Initially it is zero.</td><tr>
+<tr><td>multiline</td><td>True if the m flag was used.</td><tr>
+<tr><td>source </td><td>The source text of the regular expression</td><tr>
+</table>
+<p>RegExp objects made by regular expression literals share a single instance:</p>
+<pre>
+&lt;
+function make_a_matcher( ) {
+return /a/gi;
+}
+var x = make_a_matcher( );
+var y = make_a_matcher( );
+// Beware: x and y are the same object!
+x.lastIndex = 10;
+document.writeln(y.lastIndex);  // 10
+&gt;
+</pre>
+</p>
+<h3>Elements</h3>
+<P>Let’s look more closely at the elements that make up regular expressions.
+A regexp choice contains one or more regexp sequences. The sequences are separated
+by the | (vertical bar) character. The choice matches if any of the sequences match. It
+attempts to match each of the sequences in order. So:</p>
+<pre>
+&lt;
+"into".match(/in|int/)
+&gt;
+</pre>
+<p>matches the in in into . It wouldn’t match int because the match of in was successful.
+A regexp sequence contains one or more regexp factors. Each factor can optionally be
+followed by a quantifier that determines how many times the factor is allowed to
+appear. If there is no quantifier, then the factor will be matched one time.
+A regexp factor can be a character, a parenthesized group, a character class, or an
+escape sequence. All characters are treated literally except for the control characters
+and the special characters:</p>
+<p>\ / [ ] ( ) { } ? + * | . ^ $</p>
+which must be escaped with a \ prefix if they are to be matched literally. When in
+doubt, any special character can be given a \ prefix to make it literal. The \ prefix
+does not make letters or digits literal.
+An unescaped . matches any character except a line-ending character.
+An unescaped ^ matches the beginning of the text when the lastIndex property is
+zero. It can also match line-ending characters when the m flag is specified.
+An unescaped $ matches the end of the text. It can also match line-ending characters
+when the m flag is specified.</P>
+<h3>Regexp Escape</h3>
+<P>The backslash character indicates escapement in regexp factors as well as in strings,
+but in regexp factors, it works a little differently.</p>
+<p>As in strings, \f is the formfeed character, \n is the newline character, \r is the car-
+riage return character, \t is the tab character, and \u allows for specifying a Unicode
+character as a 16-bit hex constant. In regexp factors, \b is not the backspace character.</p>
+<p>\d is the same as [0-9] . It matches a digit. \D is the opposite: [^0-9] .</p>
+<p>\s is the same as [\f\n\r\t\u000B\u0020\u00A0\u2028\u2029] . This is a partial set of Uni-
+code whitespace characters. \S is the opposite: [^\f\n\r\t\u000B\u0020\u00A0\u2028\
+u2029] .</p>
+<p>\w is the same as [0-9A-Z_a-z] . \W is the opposite: [^0-9A-Z_a-z] . This is supposed to
+represent the characters that appear in words. Unfortunately, the class it defines is
+useless for working with virtually any real language. If you need to match a class of
+letters, you must specify your own class.</p>
+<p>A simple letter class is [A-Za-z\u00C0-\u1FFF\u2800-\uFFFD] . It includes all of Uni-
+code’s letters, but it also includes thousands of characters that are not letters. Uni-
+code is large and complex. An exact letter class of the Basic Multilingual Plane is
+possible, but would be huge and inefficient. JavaScript’s regular expressions provide
+extremely poor support for internationalization.</p>
+<p>\b was intended to be a word-boundary anchor that would make it easier to match
+text on word boundaries. Unfortunately, it uses \w to find word boundaries, so it is
+completely useless for multilingual applications. This is not a good part.</p>
+<p>\1 is a reference to the text that was captured by group 1 so that it can be matched
+again. For example, you could search text for duplicated words with:</p>
+<pre>
+&lt;
+var doubled_words =
+/[A-Za-z\u00C0-\u1FFF\u2800-\uFFFD'\-]+\s+\1/gi;
+&gt;
+</pre>
+doubled_words looks for occurrences of words (strings containing 1 or more letters)
+followed by whitespace followed by the same word.
+<p>\2 is a reference to group 2, \3 is a reference to group 3, and so on.</P>
+<h3>Regexp Group</h3>
+<P>There are four kinds of groups:
+<p>Capturing</p>
+A capturing group is a regexp choice wrapped in parentheses. The characters
+that match the group will be captured. Every capture group is given a number.
+The first capturing ( in the regular expression is group 1. The second capturing (
+in the regular expression is group 2.
+<p>Noncapturing</p>
+A noncapturing group has a (?: prefix. A noncapturing group simply matches; it
+does not capture the matched text. This has the advantage of slight faster perfor-
+mance. Noncapturing groups do not interfere with the numbering of capturing
+groups.
+<p>Positive lookahead</p>
+A positive lookahead group has a (?= prefix. It is like a noncapturing group
+except that after the group matches, the text is rewound to where the group
+started, effectively matching nothing. This is not a good part.
+<p>Negative lookahead</p>
+A negative lookahead group has a (?! prefix. It is like a positive lookahead
+group, except that it matches only if it fails to match. This is not a good part.</P>
+<h3>Regexp Class</h3>
+<p>A regexp class is a convenient way of specifying one of a set of characters. For exam-
+ple, if we wanted to match a vowel, we could write (?:a|e|i|o|u) , but it is more con-
+veniently written as the class [aeiou] .
+Classes provide two other conveniences. The first is that ranges of characters can be
+specified. So, the set of 32 ASCII special characters:
+! " # $ % & ' ( ) * + , - . / :
+; < = > ? @ [ \ ] ^ _ ` { | } ~
+could be written as:
+(?:!|"|#|\$|%|&|'|\(|\)|\*|\+|,|-|\.|\/|:|;|<|=|>|@|\[|\\|]|\^|_|` |\{|\||\}|~)
+but is slightly more nicely written as:
+[!-\/:-@\[-`{-~]
+which includes the characters from ! through / and : through @ and [ through ` and
+{ through ~ . It is still pretty nasty looking.
+The other convenience is the complementing of a class. If the first character after the
+[ is ^ , then the class excludes the specified characters.
+So [^!-\/:-@\[-`{-~] matches any character that is not one of the ASCII special
+characters.</p>
+<h3>Regexp Class Escape</h3>
+<p>The rules of escapement within a character class are slightly different than those for a
+regexp factor. [\b] is the backspace character. Here are the special characters that
+should be escaped in a character class:
+- / [ \ ] ^</p>
+<h2>Methods</h2>
+<p>JavaScript includes a small set of standard methods that are available on the stan-
+dard types.
+<h3>Array</h3>
+<p><br><b>array.cat(item...)</b></br>
+The concat method produces a new array containing a shallow copy of this array with the
+item s appended to it. If an item is an array, then each of its elements is appended individu-
+ally. Also see array.push(item...) later in this.</br>
+     var a =['a', 'b', 'c'];</br>
+     var b =['x', 'y', 'z'];</br>
+     var c =a.concat(b, true);</br>
+// c is ['a', 'b', 'c', 'x', 'y', 'z', true]</p>
+<p2><br><b>array.join(separator)</b></br>
+The join method makes a string from an array . It does this by making a string of each of
+the array ’s elements, and then concatenating them all together with a separator between
+them. The default separator is ',' . To join without separation, use an empty string as the
+separator .</br>
+If you are assembling a string from a large number of pieces, it is usually faster to put the
+pieces into an array and join them than it is tsso concatenate the pieces with the + operator:</br>
+var a = ['a', 'b', 'c'];</br>
+a.push('d');</br>
+var c = a.join('');</br>
+// c is 'abcd';</p2>
+<p3>
+<br>
+<b>array.pop( )
+</b>
+</br>
+The pop and push methods make an array work like a stack. The pop method removes and
+returns the last element in this array . If the array is empty , it returns undefined .</br>
+var a = ['a', 'b', 'c'];.</br>
+var c = a.pop( );.</br>
+// a is ['a', 'b'] & c is 'c'.</br>
+pop can be implemented like this:
+Array.method('pop', function ( ) {.</br>
+return this.splice(this.length - 1, 1)[0];.</br>
+});</p3>
+<p4><br><b>array.push(item...)</b></br>
+The push method appends items to the end of an array. Unlike the concat method, it modi-
+fies the array and appends array items whole. It returns the new length of the array :
+var a =['a', 'b', 'c'];.</br>
+var b =['x', 'y', 'z'];.</br>
+var c =a.push(b, true);.</br>
+// a is ['a', 'b', 'c', ['x', 'y', 'z'], true]</br>
+// c is 5;
+</br>
+push can be implemented like this:</br></br>
+Array.method('push', function ( ) {
+this.splice.apply(</br>
+this,</br>
+[this.length, 0].</br>
+concat(Array.prototype.slice.apply(arguments)));</br>
+return this.length;</br>
+});</p4>
+<p5><br><b>array.reverse( )</b></br>
+The reverse method modifies the array by reversing the order of the elements. It returns
+the array :</br>
+var a = ['a', 'b', 'c'];</br>
+var b = a.reverse( );</br>
+// both a and b are ['c', 'b', 'a']</p5>
+<p6><br><b>array.shift( )</b></br>
+The shift method removes the first element from an array and returns it. If the array is
+empty, it returns undefined . shift is usually much slower than pop :</br>
+var a = ['a', 'b', 'c'];</br>
+var c = a.shift( );</br>
+// a is ['b', 'c'] & c is 'a'</br>
+shift can be implemented like this:</br></br>
+Array.method('shift', function ( ) {
+retu/rn this.splice(0, 1)[0];</br>
+});</p6>
+<p7><br><b>array.slice(start, end)</b></br>
+The slice method makes a shallow copy of a portion of an array . The first element copied
+will be array[start] . It will stop before copying array[end] . The end parameter is optional,
+and the default is array.length . If either parameter is negative, array.length will be added
+to them in an attempt to make them nonnegative. If start is greater than or equal to array.
+length , the result will be a new empty array. Do not confuse slice with splice . Also see
+string.slice later.</br>
+var a = ['a', 'b', 'c'];</br>
+var b = a.slice(0, 1);  // b is ['a']</br>
+var c = a.slice(1);     // c is ['b', 'c']</br>
+var d = a.slice(1, 2); // d is ['b']</br>
+</p7>
+<p8><br><b>array.sort(comparefn)</b></br>
+The sort method sorts the contents of an array in place. It sorts arrays of numbers
+incorrectly:</br>
+var n = [4, 8, 15, 16, 23, 42];</br>
+n.sort( );</br>
+// n is [15, 16, 23, 4, 42, 8]</br>
+<p>JavaScript’s default comparison function assumes that the elements to be sorted are strings.
+It isn’t clever enough to test the type of the elements before comparing them, so it converts
+the numbers to strings as it compares them, ensuring a shockingly incorrect result.</p>
+<p>Fortunately, you may replace the comparison function with your own. Your comparison
+function should take two parameters and return 0 if the two parameters are equal, a nega-
+tive number if the first parameter should come first, and a positive number if the second
+parameter should come first. (Old-timers might be reminded of the F ORTRAN II arithmetic
+IF statement.)</p>
+<pre>
+&lt;
+n.sort(function (a, b) {
+return a - b;
+});
+// n is [4, 8, 15, 16, 23, 42];
+&gt;
+</pre>
+That function will sort numbers, but it doesn’t sort strings. If we want to be able to sort
+any array of simple values, we must work harder:
+<pre>
+&lt;
+var m = ['aa', 'bb', 'a', 4, 8, 15, 16, 23, 42];
+m.sort(function (a, b) {
+if (a === b) {
+return 0;
+}
+if (typeof a === typeof b) {
+return a < b ? -1 : 1;
+}
+return typeof a < typeof b ? -1 : 1;
+});
+// m is [4, 8, 15, 16, 23, 42, 'a', 'aa', 'bb']
+&gt;
+</pre>
+<p>If case is not significant, your comparison function should convert the operands to lower-
+case before comparing them. Also see string.localeCompare.
+With a smarter comparison function, we can sort an array of objects. To make things easier
+for the general case, we will write a function that will make comparison functions:</p>
+<pre>
+&lt;
+// Function by takes a member name string and returns
+// a comparison function that can be used to sort an
+// array of objects that contain that member.
+var by = function (name) {
+return function (o, p) {
+var a, b;
+if (typeof o === 'object' && typeof p === 'object' && o && p) {
+a = o[name];
+b = p[name];
+if (a === b) {
+return 0;
+}
+if (typeof a === typeof b) {
+return a < b ? -1 : 1;
+}
+return typeof a < typeof b ? -1 : 1;
+} else {
+throw {
+name: 'Error',
+message: 'Expected an object when sorting by ' + name;
+       };
+     }
+   };
+};
+var s = [
+{first: 'Joe',last: 'Besser'},
+{first: 'Moe',last: 'Howard'},
+{first: 'Joe',last: 'DeRita'},
+{first: 'Shemp', last: 'Howard'},
+{first: 'Larry', last: 'Fine'},
+{first: 'Curly', last: 'Howard'}
+];
+s.sort(by('first'));  // s is [
+//  {first: 'Curly', last: 'Howard'},
+//  {first: 'Joe',last: 'DeRita'},
+//  {first: 'Joe',last: 'Besser'},
+//  {first: 'Larry', last: 'Fine'},
+//  {first: 'Moe',last: 'Howard'},
+//  {first: 'Shemp', last: 'Howard'}
+&gt;
+</pre>
+<p>The sort method is not stable, so:</p>
+<p>s.sort(by('first')).sort(by('last'));</p>
+<p>is not guaranteed to produce the correct sequence. If you want to sort on multiple keys,
+you again need to do more work. We can modify by to take a second parameter, another
+compare method that will be called to break ties when the major key produces a match:</p>
+//  Function by takes a member name string and an</br>
+//  optional minor comparison function and returns</br>
+//  a comparison function that can be used to sort an</br>
+//  array of objects that contain that member. The</br>
+//  minor comparison function is used to break ties</br>
+//  when the o[name] and p[name] are equal.</br>
+<pre>
+&lt;
+var by = function (name, minor) {
+return function (o, p) {
+var a, b;
+if (o && p && typeof o === 'object' && typeof p === 'object') {
+a = o[name];
+b = p[name];
+if (a === b) {
+return typeof minor === 'function' ? minor(o, p) : 0;
+}
+if (typeof a === typeof b) {
+return a < b ? -1 : 1;
+}
+return typeof a < typeof b ? -1 : 1;
+} else {
+throw {
+name: 'Error',
+message: 'Expected an object when sorting by ' + name;       
+     };
+   }
+ };
+};
+s.sort(by('last', by('first')));
+// s is [
+//{first: 'Joe',last: 'Besser'},
+//{first: 'Joe',last: 'DeRita'},
+//{first: 'Larry', last: 'Fine'},
+//{first: 'Curly', last: 'Howard'},
+//{first: 'Moe',last: 'Howard'},
+//{first: 'Shemp', last: 'Howard'}
+// ]
+&gt;
+</pre>
+</p8>	
+<h3>array.splice(start, deleteCount, item...)</h3>
+<p>The splice method removes elements from an array , replacing them with new item s. The
+start parameter is the number of a position within the array . The deleteCount parameter is
+the number of elements to delete starting from that position. If there are additional parame-
+ters, those item s will be inserted at the position. It returns an array containing the deleted
+elements.</p>
+<p>The most popular use of splice is to delete elements from an array. Do not confuse splice
+with slice :</p>
+<pre>
+&lt;
+var a = ['a', 'b', 'c'];
+var r = a.splice(1, 1, 'ache', 'bug');
+// a is ['a', 'ache', 'bug', 'c']
+// r is ['b']
+&gt;
+</pre>
+splice can be implemented like this:
+<pre>
+&lt;
+Array.method('splice', function (start, deleteCount) {
+var max = Math.max,
+min = Math.min,
+delta,
+element,
+insertCount = max(arguments.length - 2, 0),
+k = 0,
+len = this.length,
+new_len,
+result = [],
+shift_count;
+start = start || 0;
+if (start < 0) {
+start += len;
+}
+start = max(min(start, len), 0);
+deleteCount = max(min(typeof deleteCount === 'number' ?
+deleteCount : len, len - start), 0);
+delta = insertCount - deleteCount;
+new_len = len + delta;
+while (k < deleteCount) {
+element = this[start + k];
+if (element !== undefined) {
+result[k] = element;
+}
+k += 1;
+}
+shift_count = len - start - deleteCount;
+if (delta < 0) {
+k = start + insertCount;
+while (shift_count) {
+this[k] = this[k - delta];
+k += 1;
+shift_count -= 1;
+}
+this.length = new_len;
+} else if (delta > 0) {
+k = 1;
+while (shift_count) {
+this[new_len - k] = this[len - k];
+k += 1;
+shift_count -= 1;
+}
+}
+for (k = 0; k < insertCount; k += 1) {
+this[start + k] = arguments[k + 2];
+}
+return result;
+});
+&gt;
+</pre>
+</p>
+<h3>array.unshift(item...)</h3>
+<p>The unshift method is like the push method except that it shoves the items onto the front
+of this array instead of at the end. It returns the array ’s new length :
+<pre>
+&lt;
+var a = ['a', 'b', 'c'];
+var r = a.unshift('?', '@');
+// a is ['?', '@', 'a', 'b', 'c']
+// r is 5
+&gt;
+</pre>
+<p>unshift can be implemented like this:</p>
+<pre>
+&lt;
+Array.method('unshift', function ( ) {
+this.splice.apply(this,
+[0, 0].concat(Array.prototype.slice.apply(arguments)));
+return this.length;
+});
+&gt;
+</pre></p>
+<h2>Function</h2>
+<h3>function.apply(thisArg, argArray)</h3>
+<p>The apply method invokes a function , passing in the object that will be bound to this and
+an optional array of arguments. The apply method is used in the apply invocation pattern:
+<pre>
+&lt;
+Function.method('bind', function (that) {
+&gt;
+</pre>
+// Return a function that will call this function as</br>
+// though it is a method of that object.</br>
+<pre>
+&lt;
+var method = this,
+slice = Array.prototype.slice,
+args = slice.apply(arguments, [1]);
+return function ( ) {
+return method.apply(that,
+args.concat(slice.apply(arguments, [0])));
+   };
+ });
+var x = function ( ) {
+return this.value;
+}.bind({value: 666});
+alert(x( )); // 666
+&gt;
+</pre></p>
+<h2>Number</h2>
+<h3>number.toExponential(fractionDigits)</h3>
+<p>The toExponential method converts this number to a string in the exponential form. The
+optional fractionDigits parameter controls the number of decimal places. It should be
+between 0 and 20:</p>
+document.writeln(Math.PI.toExponential(0));</br>
+document.writeln(Math.PI.toExponential(2));</br>
+document.writeln(Math.PI.toExponential(7));</br>
+document.writeln(Math.PI.toExponential(16));</br>
+document.writeln(Math.PI.toExponential( ));</br>
+// Produces</br>
+Methods</br>
+3e+0</br>
+3.14e+0</br>
+3.1415927e+0</br>
+3.1415926535897930e+0</br>
+3.141592653589793e+0</br>
+number.toFixed(fractionDigits)</br>
+<p>The toFixed method converts this number to a string in the decimal form. The optional
+fractionDigits parameter controls the number of decimal places. It should be between 0
+and 20. The default is 0:</p>
+document.writeln(Math.PI.toFixed(0));</br>
+document.writeln(Math.PI.toFixed(2));</br>
+document.writeln(Math.PI.toFixed(7));</br>
+document.writeln(Math.PI.toFixed(16));</br>
+document.writeln(Math.PI.toFixed( ));</br>
+// Produces</br>
+3</br>
+3.14</br>
+3.1415927</br>
+3.1415926535897930</br>
+3</p>
+<h3>number.toPrecision(precision)</h3>
+<p>The toPrecision method converts this number to a string in the decimal form. The optional
+precision parameter controls the number of digits of precision. It should be between 1 and
+21:</p>
+document.writeln(Math.PI.toPrecision(2));</br>
+document.writeln(Math.PI.toPrecision(7));</br>
+document.writeln(Math.PI.toPrecision(16));</br>
+document.writeln(Math.PI.toPrecision( ));</br>
+// Produces</br>
+3.1</br>
+3.141593</br>
+3.141592653589793</br>
+3.141592653589793</p>
+<h3>number.toString(radix)</h3>
+<P>The toString method converts this number to a string. The optional radix parameter
+controls radix, or base. It should be between 2 and 36. The default radix is base 10. The
+radix parameter is most commonly used with integers, but it can be used on any number.
+The most common case, number.toString( ) , can be written more simply as String(number) :</p>
+document.writeln(Math.PI.toString(2));</br>
+document.writeln(Math.PI.toString(8));</br>
+document.writeln(Math.PI.toString(16));</br>
+document.writeln(Math.PI.toString( ));</br>
+// Produces</br>
+11.001001000011111101101010100010001000010110100011</br>
+3.1103755242102643</br>
+3.243f6a8885a3</br>
+3.141592653589793</p>
+<h2>Object</h2>
+<h3>object.hasOwnProperty(name)</h3>
+<p>The hasOwnProperty method returns true if the object contains a property having the name .
+The prototype chain is not examined. This method is useless if the name is hasOwnProperty :</p>
+<pre<
+&lt;
+var a = {member: true}; 
+var b = Object.create(a);// from above topic 
+var t = a.hasOwnProperty('member');  // t is true
+var u = b.hasOwnProperty('member'); // u is false
+var v = b.member;// v is true
+&gt;
+</pre>
+</p>
+<h2>String</h2>
+<h3>string.charAt(pos)</h3>
+<p>The charAt method returns the character at position pos in this string . If pos is less than
+zero or greater than or equal to string.length , it returns the empty string. JavaScript does
+not have a character type. The result of this method is a string:</p>
+<pre>
+&lt;
+var name = 'Curly';
+var initial = name.charAt(0);  // initial is 'C'
+&gt;
+</pre>
+charAt could be implemented as:
+<pre>
+&lt;
+String.method('charAt', function (pos) {
+return this.slice(pos, pos + 1);
+});
+&gt;
+</pre>
+</p>
+<h3>string.charCodeAt(pos)</h3>
+<p>The charCodeAt method is the same as charAt except that instead of returning a string, it
+returns an integer representation of the code point value of the character at position pos in
+that string . If pos is less than zero or greater than or equal to string.length , it returns NaN :</p>
+<pre>
+&lt;
+var name = 'Curly';
+var initial = name.charCodeAt(0);
+// initial is 67
+&gt;
+</pre>
+</p>
+<h3>string.concat(string...)</h3>
+<p>The concat method makes a new string by concatenating other strings together. It is rarely
+used because the + operator is more convenient:</p>
+<pre>
+&lt;
+var s = 'C'.concat('a', 't');
+// s is 'Cat'
+&gt;
+</pre></p>
+<h3>string.indexOf(searchString, position)</h3>
+<p>The indexOf method searches for a searchString within a string . If it is found, it returns
+the position of the first matched character; otherwise, it returns –1. The optional position
+parameter causes the search to begin at some specified position in the string :</p>
+<pre>
+&lt;
+var = 'Mississippi';
+p = text.indexOf('ss');  // p is 2
+p = text.indexOf('ss', 3); // p is 5
+text = p = text.indexOf('ss',6); // p is -1
+&gt;
+</pre>
+</p>
+<h3>string.lastIndexOf(searchString, position)</h3>
+<p>The lastIndexOf method is like the indexOf method, except that it searches from the end of
+the string instead of the front:</p>
+<pre>
+&lt;
+var = 'Mississippi';
+p = text.indexOf('ss');  // p is 5
+p = text.indexOf('ss', 3); // p is 2
+text = p = text.indexOf('ss',6); // p is 5
+&gt;
+</pre>
+</p>
+<h3>string.localeCompare(that)</h3>
+<p>The localCompare method compares two strings. The rules for how the strings are
+compared are not specified. If this string is less than that string, the result is negative. If
+they are equal, the result is zero. This is similar to the convention for the array.sort
+comparison function:
+<pre>
+&lt;
+var m = ['AAA', 'A', 'aa', 'a', 'Aa', 'aaa'];
+m.sort(function (a, b) {
+return a.localeCompare(b);
+});
+// m (in some locale) is
+// ['a', 'A', 'aa', 'Aa', 'aaa', 'AAA']
+&gt;
+</pre>
+</p>
+<h3>string.match(regexp)</h3>
+<p>The match method matches a string and a regular expression. How it does this depends on
+the g flag. If there is no g flag, then the result of calling string.match(regexp) is the same as
+calling regexp.exec(string) . However, if the regexp has the g flag, then it produces an array
+of all the matches but excludes the capturing groups:</p>
+<pre>
+&lt;
+var text = '<html><body bgcolor=linen><p>' +
+        'This is <b>bold</b>!<\/p><\/body><\/html>';
+var tags = /[^<>]+|<(\/?)([A-Za-z]+)([^<>]*)>/g;
+var a, i;
+
+a = text.match(tags);
+for (i = 0; i < a.length; i += 1) {
+document.writeln(('// [' + i + '] ' + a[i]).entityify( ));
+}
+&gt;
+</pre>
+// The result is
+<pre>
+&lt;
+// [0] html
+// [1] body bgcolor=linen
+// [2] p
+// [3] this is
+// [4] b
+// [5] bold
+// [6] /b
+// [7]  !
+// [8] p
+// [9] /body
+// [10] /html
+&gt;
+</pre>
+</p>
+<h3>string.replace(searchValue, replaceValue)</h3>
+<p>The replace method does a search and replace operation on this string , producing a new
+string. The searchValue argument can be a string or a regular expression object. If it is a
+string, only the first occurrence of the searchValue is replaced, so:</p>
+<pre>
+&lt;
+var result = "mother_in_law".replace('_', '-');
+&gt;
+</pre>
+will produce "mother-in_law" , which might be a disappointment.
+<p>If searchValue is a regular expression and if it has the g flag, then it will replace all occur-
+rences. If it does not have the g flag, then it will replace only the first occurrence.
+The replaceValue can be a string or a function. If replaceValue is a string, the character $
+has special meaning:</p>
+<pre>
+&lt;
+var oldareacode = /\((\d{3})\)/g;
+varp = '(555)666-1212'.replace(oldareacode, '$1-');
+// p is '555-555-1212'
+&gt;
+</pre>
+Dollar sequence Replacement:
+
+// Capture 3 digits within parens
+
+<table border="1px">
+<tr><td><b>doller sequence</b></td><td><b>replacement</b></td></tr>
+<tr><td>$$</td><td>  $</td></tr>
+<tr><td>$&</td><td>  The matched text</td></tr>
+<tr><td>$ </td><td>  Number Capture group text</td></tr>
+<tr><td>$`</td><td>  The text preceding the match</td></tr>
+<tr><td>$'</td><td>  The text following the match</td></tr>
+</table>
+<p>If the replaceValue is a function, it will be called for each match, and the string returned by
+the function will be used as the replacement text. The first parameter passed to the func-
+tion is the matched text. The second parameter is the text of capture group 1, the next
+parameter is the text of capture group 2, and so on:</p>
+String.method('entityify', function ( ) {</br>
+<pre>
+&lt;
+var character = {
+'<' : '&lt;',
+'>' : '&gt;',
+'&' : '&amp;',
+'"' : '&quot;'
+};
+
+// entityify method, which
+// returns the result of calling the replace method.
+// Its replaceValue function returns the result of
+// looking a character up in an object. This use of
+// an object usually outperforms switch statements.
+
+return function ( ) {
+return this.replace(/[<>&"]/g, function (c) {
+return character[c];
+});
+};
+}( ));
+alert("<&>".entityify( )); // &lt;&amp;&gt;
+&gt;
+</pre>
+<h3>string.search(regexp)</h3>
+<p>The search method is like the indexOf method, except that it takes a regular expression
+object instead of a string. It returns the position of the first character of the first match, if
+there is one, or –1 if the search fails. The g flag is ignored. There is no position parameter:
+var text = 'and in it he says "Any damn fool could';</p>
+<pre>&lt;
+var pos = text.search(/["']/);
+// pos is 18
+&gt;
+</pre>
+<h3>string.slice(start, end)</h3>
+<p>The slice method makes a new string by copying a portion of another string . If the start
+parameter is negative, it adds string.length to it. The end parameter is optional, and its
+default value is string.length . If the end parameter is negative, then string.length is added
+to it. The end parameter is one greater than the position of the last character. To get n char-
+acters starting at position p , use string.slice(p, p + n) . Also see string.substring and
+array.slice , later and earlier in this chapter, respectively.</P>
+<pre>&lt;
+var text = 'and in it he says "Any damn fool could';
+var a = text.slice(18);
+// a is '"Any damn fool could'
+var b = text.slice(0, 3);
+// b is 'and'
+var c = text.slice(-5);	
+// c is 'could'
+var d = text.slice(19, 32);
+// d is 'Any damn fool'
+&gt;
+</pre>
+<h3>string.split(separator, limit)</h3>
+<p>The split method creates an array of strings by splitting this string into pieces. The
+optional limit parameter can limit the number of pieces that will be split. The separator
+parameter can be a string or a regular expression.</P>
+<P>If the separator is the empty string, an array of single characters is produced:</P>
+<pre>&lt;
+var digits = '0123456789';
+var a = digits.split('', 5);
+// a is ['0', '1', '2', '3', '456789']
+&gt;
+</pre>
+Otherwise, the string is searched for all occurrences of the separator . Each unit of text
+between the separators is copied into the array. The g flag is ignored:
+<pre>&lt;
+var ip = '192.168.1.0';
+var b = ip.split('.');
+// b is ['192', '168', '1', '0']
+	
+var c = '|a|b|c|'.split('|');
+// c is ['', 'a', 'b', 'c', '']
+var text = 'last, first ,middle';
+var d = text.split(/\s*,\s*/);
+// d is [
+// 'last',
+// 'first',
+// 'middle'
+// ]
+&gt;
+</pre>
+There are some special cases to watch out for. Text from capturing groups will be included
+in the split:
+<pre>&lt;
+var e = text.split(/\s*(,)\s*/);
+// e is [
+// 'last',
+// ',',
+// 'first',
+// ',',
+// 'middle'
+// ]
+&gt;
+</pre>
+Some implementations suppress empty strings in the output array when the separator is a
+regular expression:
+<pre>&lt;
+var f = '|a|b|c|'.split(/\|/);
+// f is ['a', 'b', 'c'] on some systems, and
+// f is ['', 'a', 'b', 'c', ''] on others
+&gt;
+</pre>
+<h3>string.substring(start, end)</h3>
+<p>The substring method is the same as the slice method except that it doesn’t handle the
+adjustment for negative parameters. There is no reason to use the substring method. Use
+slice instead.</p>
+<h3>string.toLocaleLowerCase( )</h3>
+<p>The toLocaleLowerCase method produces a new string that is made by converting this
+string to lowercase using the rules for the locale. This is primarily for the benefit of
+Turkish because in that language ‘I’ converts to ı , not ‘i’.</p>
+<h3>string.toLocaleUpperCase( )</h3>
+<p>The toLocaleUpperCase method produces a new string that is made by converting this
+string to uppercase using the rules for the locale. This is primarily for the benefit of
+Turkish, because in that language ‘i’ converts to ‘ ’, not ‘I’.</p>
+<h3>string.toLowerCase( )</h3>
+<p>The toLowerCase method produces a new string that is made by converting this string to
+lowercase.</p>
+<h3>string.toUpperCase( )</h3>
+<p>The toUpperCase method produces a new string that is made by converting this string to
+uppercase.</p>
+<h3>String.fromCharCode(char...)</h3>
+<p>The String.fromCharCode function produces a string from a series of numbers.
+<pre>
+&lt;
+var a = String.fromCharCode(67, 97, 116);
+// a is 'Cat'
+&gt;
+</pre></p>
+<h2>Style</h2>
+<p>Computer programs are the most complex things that humans make. Programs are
+made up of a huge number of parts, expressed as functions, statements, and expres-
+sions that are arranged in sequences that must be virtually free of error. The runtime
+behavior has little resemblance to the program that implements it. Software is usually
+expected to be modified over the course of its productive life. The process of convert-
+ing one correct program into a different correct program is extremely challenging.
+Good programs have a structure that anticipates—but is not overly burdened by—
+the possible modifications that will be required in the future. Good programs also
+have a clear presentation. If a program is expressed well, then we have the best
+chance of being able to understand it so that it can be successfully modified or
+repaired.<p>
+<p>These concerns are true for all programming languages, and are especially true for
+JavaScript. JavaScript’s loose typing and excessive error tolerance provide little
+compile-time assurance of our programs’ quality, so to compensate, we should code
+with strict discipline.</p>
+<p>JavaScript contains a large set of weak or problematic features that can undermine
+our attempts to write good programs. We should obviously avoid JavaScript’s worst
+features. Surprisingly, perhaps, we should also avoid the features that are often use-
+ful but occasionally hazardous. Such features are attractive nuisances, and by avoid-
+ing them, a large class of potential errors is avoided.</p>
+<p>The long-term value of software to an organization is in direct proportion to the
+quality of the codebase. Over its lifetime, a program will be handled by many pairs of
+hands and eyes. If a program is able to clearly communicate its structure and charac-
+teristics, it is less likely to break when it is modified in the never-too-distant future.
+JavaScript code is often sent directly to the public. It should always be of publication
+quality. Neatness counts. By writing in a clear and consistent style, your programs
+become easier to read.</p>
+<p>Programmers can debate endlessly on what constitutes good style. Most program-
+mers are firmly rooted in what they’re used to, such as the prevailing style where they
+went to school, or at their first job. Some have had profitable careers with no sense of
+style at all. Isn’t that proof that style doesn’t matter? And even if style doesn’t mat-
+ter, isn’t one style as good as any other?</p>
+<p>It turns out that style matters in programming for the same reason that it matters in
+writing. It makes for better reading.</p>
+<p>Computer programs are sometimes thought of as a write-only medium, so it matters
+little how it is written as long as it works. But it turns out that the likelihood a pro-
+gram will work is significantly enhanced by our ability to read it, which also
+increases the likelihood that it actually works as intended. It is also the nature of
+software to be extensively modified over its productive life. If we can read and under-
+stand it, then we can hope to modify and improve it.</p>
+<p>Throughout this book I have used a consistent style. My intention was to make the
+code examples as easy to read as possible. I used whitespace consistently to give you
+<p>more cues about the meaning of my programs.</p>
+I indented the contents of blocks and object literals four spaces. I placed a space
+between if and ( so that the if didn’t look like a function invocation. Only in invo-
+cations do I make ( adjacent with the preceding symbol. I put spaces around all infix
+operators except for . and [ , which do not get spaces because they have higher prece-
+dence. I use a space after every comma and colon.</p>
+<p>I put at most one statement on a line. Multiple statements on a line can be misread.
+If a statement doesn’t fit on a line, I will break it after a comma or a binary operator.
+That gives more protection against copy/paste errors that are masked by semicolon
+insertion. (The tragedy of semicolon insertion will be revealed in Appendix A.) I
+indent the remainder of the statement an extra four spaces, or eight spaces if four
+would be ambiguous (such as a line break in the condition part of an if statement).
+I always use blocks with structured statements such as if and while because it is less
+error prone.</p>
+ I have seen:
+<pre>
+&lt;
+if (a)
+b( );
+&gt;
+</pre>
+become:
+<pre>
+&lt;
+if (a)
+b( );
+c( );
+&gt;
+</pre>
+which is an error that is very difficult to spot.</p>
+ It looks like:
+<pre>
+&lt;
+if (a) {
+b( );
+( );
+}
+&gt;
+</pre>
+but it means:
+<pre>
+&lt;
+if (a) {
+( );
+}
+c( );
+&gt;
+</pre>
+<p>Code that appears to mean one thing but actually means another is likely to cause
+bugs. A pair of braces is really cheap protection against bugs that can be expensive to
+find.</p>
+<p>I always use the K&R style, putting the { at the end of a line instead of the front,
+because it avoids a horrible design blunder in JavaScript’s return statement.</p>
+<p>I included some comments. I like to put comments in my programs to leave informa-
+tion that will be read at a later time by people (possibly myself) who will need to
+understand what I was thinking. Sometimes I think about comments as a time
+machine that I use to send important messages to future me.</p><p>
+<p>I struggle to keep comments up-to-date. Erroneous comments can make programs
+even harder to read and understand. I can’t afford that.</p>
+<p>I tried to not waste your time with useless comments like this:
+<pre>
+&lt;
+i = 0; // Set i to zero.
+&gt;
+</pre>
+<p>In JavaScript, I prefer to use line comments. I reserve block comments for formal
+documentation and for commenting out.</p>
+<p>I prefer to make the structure of my programs self-illuminating, eliminating the need
+for comments. I am not always successful, so while my programs are awaiting perfec-
+tion, I am writing comments.</p>
+<p>JavaScript has C syntax, but its blocks don’t have scope. So, the convention that vari-
+ables should be declared at their first use is really bad advice in JavaScript. JavaScript
+has function scope, but not block scope, so I declare all of my variables at the begin-
+ning of each function. JavaScript allows variables to be declared after they are used.
+That feels like a mistake to me, and I don’t want to write programs that look like
+mistakes. I want my mistakes to stand out. Similarly, I never use an assignment
+expression in the condition part of an if because:</p>
+<p>is probably intended to be:</p>
+<pre>
+&lt;
+if (a === b) { ... }
+&gt;
+</pre>
+<p>StyleI want to avoid idioms that look like mistakes.</p>
+<p>I never allow switch cases to fall through to the next case. I once found a bug in my
+code caused by an unintended fall through immediately after having made a vigor-
+ous speech about why fall through was sometimes useful. I was fortunate in that I
+was able to learn from the experience. When reviewing the features of a language, I
+now pay special attention to features that are sometimes useful but occasionally dan-
+gerous. Those are the worst parts because it is difficult to tell whether they are being
+used correctly. That is a place where bugs hide.</p>
+<p>Quality was not a motivating concern in the design, implementation, or standardiza-
+tion of JavaScript. That puts a greater burden on the users of the language to resist
+the language’s weaknesses.</p>
+<p>JavaScript provides support for large programs, but it also provides forms and idi-
+oms that work against large programs. For example, JavaScript provides conve-
+niences for the use of global variables, but global variables become increasingly
+problematic as programs scale in complexity.</p>
+<p>I use a single global variable to contain an application or library. Every object has its
+own namespace, so it is easy to use objects to organize my code. Use of closure pro-
+vides further information hiding, increasing the strength of my modules.</p>
+<h2>Beautiful Features</h2>
+<p>I was invited last year to contribute a chapter to Andy Oram’s and Greg Wilson’s
+Beautiful Code (O’Reilly), an anthology on the theme of beauty as expressed in com-
+puter programs. I wanted to write my chapter in JavaScript. I wanted to use it to
+present something abstract, powerful, and useful to show that the language was up
+to it. And I wanted to avoid the browser and other venues in which JavaScript is
+typecast. I wanted to show something respectable with some heft to it.</p>
+<p>I immediately thought of Vaughn Pratt’s Top Down Operator Precedence parser,
+which I use in JSLint. Parsing is an important topic in computing.
+The ability to write a compiler for a language in itself is still a test for the complete-
+ness of a language.</p>
+<p>I wanted to include all of the code for a parser in JavaScript that parses JavaScript.
+But my chapter was just one of 30 or 40, so I felt constrained in the number of pages
+I could consume. A further complication was that most of my readers would have no
+experience with JavaScript, so I also would have to introduce the language and its
+peculiarities.</p>
+<p>So, I decided to subset the language. That way, I wouldn’t have to parse the whole
+language, and I wouldn’t have to describe the whole language. I called the subset
+Simplified JavaScript. Selecting the subset was easy: it included just the features that
+<p>I needed to write a parser. This is how I described it in Beautiful Code:</p>
+The subset contained the best of the Good Parts. Even though it was a small lan-
+guage, it was very expressive and powerful. JavaScript has lots of additional features
+that really don’t add very much, and as you’ll find in the appendixes that follow, it
+has a lot of features with negative value. There was nothing ugly or bad in the sub-
+set. All of that fell away.</p>
+<p>Simplified JavaScript isn’t strictly a subset. I added a few new features. The simplest
+was adding pi as a simple constant. I did that to demonstrate a feature of the parser.
+I also demonstrated a better reserved word policy and showed that reserved words
+are unnecessary. In a function, a word cannot be used as both a variable or parame-
+ter name and a language feature. You can use a word for one or the other, and the
+programmer gets to choose. That makes a language easier to learn because you don’t
+need to be aware of features you don’t use. And it makes the language easier to
+extend because it isn’t necessary to reserve more words to add new features.</p>
+<p>I also added block scope. Block scope is not a necessary feature, but not having it
+confuses experienced programmers. I included block scope because I anticipated that
+my parser would be used to parse languages that are not JavaScript, and those lan-
+guages would do scoping correctly. The code I wrote for the parser is written in a
+style that doesn’t care if block scope is available or not. I recommend that you write
+that way, too.</p>
+<p>When I started thinking about this book, I wanted to take the subset idea further, to
+show how to take an existing programming language and make significant improve-
+ments to it by making no changes except to exclude the low-value features.</p>
+<p>We see a lot of feature-driven product design in which the cost of features is not
+properly accounted. Features can have a negative value to consumers because they
+make the products more difficult to understand and use. We are finding that people
+like products that just work. It turns out that designs that just work are much harder
+to produce than designs that assemble long lists of features.</p>
+<p>Features have a specification cost, a design cost, and a development cost. There is a
+testing cost and a reliability cost. The more features there are, the more likely one
+will develop problems or will interact badly with another. In software systems, there
+is a storage cost, which was becoming negligible, but in mobile applications is
+becoming significant again. There are ascending performance costs because Moore’s
+Law doesn’t apply to batteries.</p>
+<p>Features have a documentation cost. Every feature adds pages to the manual,
+increasing training costs. Features that offer value to a minority of users impose a
+cost on all users. So, in designing products and programming languages, we want to
+get the core features—the good parts—right because that is where we create most of
+the value.</p>
+<p>We all find the good parts in the products that we use. We value simplicity, and
+when simplicity isn’t offered to us, we make it ourselves. My microwave oven has
+tons of features, but the only ones I use are cook and the clock. And setting the clock
+is a struggle. We cope with the complexity of feature-driven design by finding and
+sticking with the good parts.
+It would be nice if products and programming languages were designed to have only
+good parts.</p>
+
+</body>
+</html>
